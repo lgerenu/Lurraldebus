@@ -70,6 +70,11 @@ public class DBHelper extends SQLiteOpenHelper {
         return checkDB != null;
     }
      
+    /**
+     * Datubasea kopiatu.
+     * @param pathFile
+     * @throws IOException
+     */
     private void copyDataBase(File pathFile) throws IOException {
         InputStream myInput = mContext.getAssets().open("pesa.db");
         OutputStream myOutput = new FileOutputStream(pathFile);
