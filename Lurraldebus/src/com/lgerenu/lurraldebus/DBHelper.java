@@ -102,6 +102,17 @@ public class DBHelper extends SQLiteOpenHelper {
 
     }
 
+    /**
+     * Datu basea itxi
+     * @throws SQLException
+     */
+    public void closeDataBase() throws SQLiteException{
+    	//Close the database
+    	datuBasea.close();
+    	Log.i("consola", "Datubasea itxita dago.");
+
+    }
+
 	@Override
 	public void onCreate(SQLiteDatabase arg0) {
 		// TODO Auto-generated method stub
