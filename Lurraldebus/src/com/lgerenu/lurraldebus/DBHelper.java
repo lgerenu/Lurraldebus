@@ -5,8 +5,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -111,6 +114,29 @@ public class DBHelper extends SQLiteOpenHelper {
     	datuBasea.close();
     	Log.i("consola", "Datubasea itxita dago.");
 
+    }
+    
+    /**
+     * Geltokien zerrenda bat lortzen da, latitude eta longitude tarte batean.
+     * @param maxLat
+     * @param minLat
+     * @param maxLon
+     * @param minLon
+     * @return
+     */
+    public List<Geltokia> geltokiakIrakurri(double maxLat, double minLat, double maxLon, double minLon) {
+    	SQLiteDatabase db = getReadableDatabase();
+    	List<Geltokia> zerrendaGeltokiak = new ArrayList<Geltokia>();
+    	String query = "SELECT * FROM gtfs_stops WHERE stop_lat>"+minLat+" AND stop_lat<"+maxLat+" AND stop_lon>"+minLon+" AND stop_lon<"+maxLon;
+    	Cursor c = db.rawQuery(query, null);
+    	c.moveToFirst();
+    	do {
+    		Geltokia geltokia = new Geltokia(c.getInt(0), c.getString(1), c.getString(2), c.getDouble(3), c.getDouble(4), c.getInt(5));
+    		zerrendaGeltokiak.add(geltokia);
+    	} while (c.moveToNext());
+    	db.close();
+    	c.close();
+    	return zerrendaGeltokiak;
     }
 
 	@Override
