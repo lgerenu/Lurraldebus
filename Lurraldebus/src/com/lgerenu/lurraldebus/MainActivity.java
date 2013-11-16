@@ -124,9 +124,11 @@ public class MainActivity extends Activity {
 		/* Datu basea itxi */
 		datuBasea.close();
 		/* Pantailan erakutsi */
-		for (int i=0; i<geldiuneKopurua; i++) {
-			Log.i("consola", "trip_id: "+geldiuneak.get(i).getId()+" arrival_time: "+geldiuneak.get(i).getArrivalTime());
-		}
+//		for (int i=0; i<geldiuneKopurua; i++) {
+//			Log.i("consola", "trip_id: "+geldiuneak.get(i).getId()+" arrival_time: "+geldiuneak.get(i).getArrivalTime());
+//		}
+		StopTimesAdapter geldiuneAdapter = new StopTimesAdapter(getApplicationContext(), geldiuneak);
+		geldiuneAdapter.getView(1, null, null);
 		
 	}
 
