@@ -2,7 +2,10 @@ package com.lgerenu.lurraldebus;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+
+import org.w3c.dom.ls.LSInput;
 
 import android.os.Bundle;
 import android.app.Activity;
@@ -10,7 +13,11 @@ import android.content.Context;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.widget.Adapter;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.Toast;
 import android.location.Location;
 import android.location.LocationManager;
@@ -28,7 +35,14 @@ public class MainActivity extends Activity {
 	/* Longitudean dagoen diferentziarik handiena geltoki hurbilena aurkitzeko */
 	private static double MAX_LON_DIFF = 0.05;
 	
+	/* Oraingo ordutik zenbat segundu aurrera begiratuko diren autobusak */
+	private static int MAX_BUS_STOP_TIME = 3600; // 1h
+	/* Oraingo ordutik zenbat segundu atzera begiratuko diren autobusak */
+	private static int MIN_BUS_STOP_TIME = 300; // 5min
+	
 	private Geltokia geltokiHurbilena;
+	
+	private ListView listvBidaiak;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +53,22 @@ public class MainActivity extends Activity {
 		locManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
 		locListener = new NireLocationListener();
 		locManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locListener);
+		
+		//Bidaien zerrendaren trepeta lortu
+		listvBidaiak = (ListView)findViewById(R.id.listvBidaiak);
 
+		/*
+		 * Sortu datu basea
+		 */
+		datuBasea = new DBHelper(getApplicationContext());
+		try {
+			datuBasea.createDataBase();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		
 		/**
 		 * Geltokia lortzeko botoia
 		 */
@@ -47,73 +76,83 @@ public class MainActivity extends Activity {
 		btnGeltokiaLortu.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				String Buff = "Nire kokapena: Latitudea "+locManager.getLastKnownLocation(locManager.NETWORK_PROVIDER).getLatitude() +
-						" Longitudea "+ locManager.getLastKnownLocation(locManager.NETWORK_PROVIDER).getLongitude();
-				/* Datu basean, aukeratu hurbilen dauden geltokiak */
+				/* Datu base ireki */
+				datuBasea.openDataBase();
+				/* Nire kokapena zehaztu */
 				double actLat = locManager.getLastKnownLocation(locManager.NETWORK_PROVIDER).getLatitude();
 				double actLon = locManager.getLastKnownLocation(locManager.NETWORK_PROVIDER).getLongitude();
-				Log.i("consola", "Datubasetik irakurri behar dugu...");
-				List<Geltokia> geltokiak = datuBasea.geltokiakIrakurri(actLat+MAX_LAT_DIFF, actLat-MAX_LAT_DIFF, actLon+MAX_LON_DIFF, actLon-MAX_LON_DIFF);
+				/* Datu basean hurbilen dauden geltokiak bilatu */
+				List<Geltokia> geltokiak = datuBasea.geltokiakIrakurri(actLat+MAX_LAT_DIFF, actLat-MAX_LAT_DIFF,
+						actLon+MAX_LON_DIFF, actLon-MAX_LON_DIFF);
+				/* Datu basea itxi */
+				datuBasea.close();
+				/* Aukeratutako geltoki kopurua lortu */
 				int geltokiKopurua = geltokiak.size();
-				Log.i("consola", "Geltoki kopurua: "+geltokiKopurua);
-				/* Bilatu hurbilen dagoen geltokia */
+				/* Hurbilen dagoen geltokia aukeratu */
 				int azkenDistantzia = 10000; // 10 Km.
 				for(int i=0; i<geltokiKopurua; i++) {
-					int distantzia = getDistance(actLat, actLon, geltokiak.get(i).getLat(), geltokiak.get(i).getLon()); 
-					Log.i("consola", "Distantzia: "+distantzia);
+					int distantzia = getDistance(actLat, actLon,
+							geltokiak.get(i).getLat(), geltokiak.get(i).getLon()); 
 					if (distantzia < azkenDistantzia) {
 						azkenDistantzia = distantzia;
-						Log.i("consola", "Orain arteko distantziarik motzena: "+azkenDistantzia);
 						geltokiHurbilena = geltokiak.get(i);
 					}
 				}
 				Toast.makeText(getApplicationContext(), "Geltoki hurbilena: "+geltokiHurbilena.getName(), Toast.LENGTH_LONG).show();
+				/* Geltoki horri dagozkion geldiuneak aurkitu */
+				bidaiakLortu(geltokiHurbilena.getId());
 			}
 		});
 
-		/**
-		 * Datu basea sortzeko botoia
-		 */
-		Button btnDatubaseaSortu = (Button) findViewById(R.id.btnDatubaseaSortu);
-		btnDatubaseaSortu.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				datuBasea = new DBHelper(getApplicationContext());
-				try {
-					datuBasea.createDataBase();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		});
-
-		/**
-		 * Datu base irekitzeko botoia
-		 */
-		Button btnDatubaseaIreki = (Button) findViewById(R.id.btnDatubaseaIreki);
-		btnDatubaseaIreki.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				datuBasea.openDataBase();
-			}
-		});
+	}
+	
+	/**
+	 * 
+	 * @param geltokiaId
+	 */
+	private void bidaiakLortu(int geltokiaId) {
+		/* Datu base ireki */
+		datuBasea.openDataBase();
+		/* Uneko ordua eta eguna lortu */
+		Calendar dataOrdua = Calendar.getInstance();
+		int orduaSegundutan = getDayTimeSeconds(dataOrdua.get(dataOrdua.HOUR_OF_DAY), dataOrdua.get(dataOrdua.MINUTE), dataOrdua.get(dataOrdua.SECOND));
+		orduaSegundutan = 46800; // 13:00:00ak direla simulatzeko
+		/* Geltoki honetako geldiuneak atera */
+		List<StopTimes> geldiuneak = datuBasea.geldialdiakIrakurri(geltokiaId, orduaSegundutan+MAX_BUS_STOP_TIME, orduaSegundutan-MIN_BUS_STOP_TIME);
+		int geldiuneKopurua = geldiuneak.size();
+		Log.i("consola", "Geldiune kopurua: "+geldiuneKopurua);
+		/* Datu basea itxi */
+		datuBasea.close();
+		/* Pantailan erakutsi */
+		for (int i=0; i<geldiuneKopurua; i++) {
+			Log.i("consola", "trip_id: "+geldiuneak.get(i).getId()+" arrival_time: "+geldiuneak.get(i).getArrivalTime());
+		}
+		
 	}
 
 	/**
+	 * Eguneko ordua segundutan ematen du (gauerditik pasa diren segunduak).
+	 * @param hours
+	 * @param minutes
+	 * @param seconds
+	 * @return Gauerditik pasatu den segundu kopurua.
+	 */
+	public int getDayTimeSeconds(int hours, int minutes, int seconds) {
+		int minutuakGuztira = hours*60 + minutes;
+		int segunduakGuztira = minutuakGuztira*60 + seconds;
+		return segunduakGuztira;		
+	}
+	
+	/**
 	 * Bi punturen arteko distantzia kalkulatzen du.
-	 * @param lat_a
-	 * @param lng_a
-	 * @param lat_b
-	 * @param lon_b
+	 * @param lat_a A puntuaren latitudea.
+	 * @param lng_a A puntuaren longitudea.
+	 * @param lat_b B puntuaren latitudea.
+	 * @param lon_b B puntuaren longitudea.
 	 * @return Distantzia metrotan.
 	 */
 	public static int getDistance(double lat_a, double lng_a, double lat_b, double lon_b){
 		int Radius = 6371000; //Radio de la tierra
-//		double lat1 = lat_a / 1E6;
-//		double lat2 = lat_b / 1E6;
-//		double lon1 = lng_a / 1E6;
-//		double lon2 = lon_b / 1E6;
 		double lat1 = lat_a;
 		double lat2 = lat_b;
 		double lon1 = lng_a;

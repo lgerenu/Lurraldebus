@@ -9,30 +9,20 @@
     tools:context=".MainActivity" >
 
     <Button
-        android:id="@+id/btnDatubaseaSortu"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/btnGeltokiaLortu"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="37dp"
-        android:text="Datu basea sortu" />
-
-    <Button
         android:id="@+id/btnGeltokiaLortu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="28dp"
         android:text="Geltokia lortu" />
 
-    <Button
-        android:id="@+id/btnDatubaseaIreki"
-        android:layout_width="wrap_content"
+    <ListView
+        android:id="@+id/listvBidaiak"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/btnDatubaseaSortu"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="23dp"
-        android:text="Datu basea ireki" />
+        android:layout_below="@+id/btnGeltokiaLortu"
+        android:layout_centerHorizontal="true" >
+    </ListView>
 
 </RelativeLayout>

@@ -131,14 +131,36 @@ public class DBHelper extends SQLiteOpenHelper {
     	Cursor c = db.rawQuery(query, null);
     	c.moveToFirst();
     	do {
-    		Geltokia geltokia = new Geltokia(c.getInt(0), c.getString(1), c.getString(2), c.getDouble(3), c.getDouble(4), c.getInt(5));
+    		Geltokia geltokia = new Geltokia(c.getInt(0), c.getString(1), c.getString(2), c.getDouble(3), c.getDouble(4));
     		zerrendaGeltokiak.add(geltokia);
     	} while (c.moveToNext());
     	db.close();
     	c.close();
     	return zerrendaGeltokiak;
     }
-
+    
+    /**
+     * @param geltokiaId
+     * @param maxOrduaSeg
+     * @param minOrduaSeg
+     * @return
+     */
+    public List<StopTimes> geldialdiakIrakurri(int geltokiaId, int maxOrduaSeg, int minOrduaSeg) {
+    	SQLiteDatabase db = getReadableDatabase();
+    	List<StopTimes> zerrendaGeldiuneak = new ArrayList<StopTimes>();
+    	String[] irakurtzekoDatuak = {"trip_id", "arrival_time", "departure_time", "stop_id", "stop_sequence", "arrival_time_seconds", "departure_time_seconds"};
+    	String baldintzak = "stop_id="+geltokiaId+" AND arrival_time_seconds>"+minOrduaSeg+" AND arrival_time_seconds<"+maxOrduaSeg;
+    	Cursor c = db.query("gtfs_stop_times", irakurtzekoDatuak, baldintzak, null, null, null, "arrival_time_seconds", null);
+    	c.moveToFirst();
+    	do {
+    		StopTimes geldiunea = new StopTimes(c.getInt(0), c.getString(1), c.getString(2), c.getInt(3), c.getInt(4), c.getInt(5), c.getInt(6));
+    		zerrendaGeldiuneak.add(geldiunea);
+    	} while (c.moveToNext());
+    	db.close();
+    	c.close();
+    	return zerrendaGeldiuneak;
+    }
+    
 	@Override
 	public void onCreate(SQLiteDatabase arg0) {
 		// TODO Auto-generated method stub
