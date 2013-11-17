@@ -153,12 +153,37 @@ public class DBHelper extends SQLiteOpenHelper {
     	Cursor c = db.query("gtfs_stop_times", irakurtzekoDatuak, baldintzak, null, null, null, "arrival_time_seconds", null);
     	c.moveToFirst();
     	do {
-    		StopTimes geldiunea = new StopTimes(c.getInt(0), c.getString(1), c.getString(2), c.getInt(3), c.getInt(4), c.getInt(5), c.getInt(6));
+    		int route_id = routeLortu(c.getInt(0));
+    		StopTimes geldiunea = new StopTimes(c.getInt(0), c.getString(1), c.getString(2), c.getInt(3), c.getInt(4), c.getInt(5), c.getInt(6), route_id, routeIzenaLortu(route_id));
     		zerrendaGeldiuneak.add(geldiunea);
     	} while (c.moveToNext());
     	db.close();
     	c.close();
     	return zerrendaGeldiuneak;
+    }
+    
+    public int routeLortu(int trip_id) {
+    	SQLiteDatabase db = getReadableDatabase();
+    	String[] irakurtzekoDatuak = {"route_id"};
+    	String baldintzak = "trip_id="+trip_id;
+    	Cursor c = db.query("gtfs_trips", irakurtzekoDatuak, baldintzak, null, null, null, null, null);
+    	c.moveToFirst();
+    	int route_id = c.getInt(0);
+    	db.close();
+    	c.close();
+    	return route_id;
+    }
+    
+    public String routeIzenaLortu(int route_id) {
+    	SQLiteDatabase db = getReadableDatabase();
+    	String[] irakurtzekoDatuak = {"route_long_name"};
+    	String baldintzak = "route_id="+route_id;
+    	Cursor c = db.query("gtfs_routes", irakurtzekoDatuak, baldintzak, null, null, null, null, null);
+    	c.moveToFirst();
+    	String route_izena = c.getString(0);
+    	db.close();
+    	c.close();
+    	return route_izena;
     }
     
 	@Override

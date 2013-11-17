@@ -1,11 +1,8 @@
 package com.lgerenu.lurraldebus;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-
-import org.w3c.dom.ls.LSInput;
 
 import android.os.Bundle;
 import android.app.Activity;
@@ -13,16 +10,12 @@ import android.content.Context;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
-import android.widget.Adapter;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.Toast;
 import android.location.Location;
 import android.location.LocationManager;
 import android.location.LocationListener;
-import android.database.Cursor;
 
 public class MainActivity extends Activity {
 
@@ -116,19 +109,16 @@ public class MainActivity extends Activity {
 		/* Uneko ordua eta eguna lortu */
 		Calendar dataOrdua = Calendar.getInstance();
 		int orduaSegundutan = getDayTimeSeconds(dataOrdua.get(dataOrdua.HOUR_OF_DAY), dataOrdua.get(dataOrdua.MINUTE), dataOrdua.get(dataOrdua.SECOND));
-		orduaSegundutan = 46800; // 13:00:00ak direla simulatzeko
+//		orduaSegundutan = 46800; // 13:00:00ak direla simulatzeko
 		/* Geltoki honetako geldiuneak atera */
 		List<StopTimes> geldiuneak = datuBasea.geldialdiakIrakurri(geltokiaId, orduaSegundutan+MAX_BUS_STOP_TIME, orduaSegundutan-MIN_BUS_STOP_TIME);
 		int geldiuneKopurua = geldiuneak.size();
 		Log.i("consola", "Geldiune kopurua: "+geldiuneKopurua);
 		/* Datu basea itxi */
 		datuBasea.close();
-		/* Pantailan erakutsi */
-//		for (int i=0; i<geldiuneKopurua; i++) {
-//			Log.i("consola", "trip_id: "+geldiuneak.get(i).getId()+" arrival_time: "+geldiuneak.get(i).getArrivalTime());
-//		}
 		StopTimesAdapter geldiuneAdapter = new StopTimesAdapter(getApplicationContext(), geldiuneak);
-		geldiuneAdapter.getView(1, null, null);
+		geldiuneAdapter.getView(0, null, null);
+		listvBidaiak.setAdapter(geldiuneAdapter);
 		
 	}
 
