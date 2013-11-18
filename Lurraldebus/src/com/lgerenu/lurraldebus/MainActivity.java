@@ -4,18 +4,20 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;
 
-import android.os.Bundle;
 import android.app.Activity;
 import android.content.Context;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
-import android.location.Location;
-import android.location.LocationManager;
-import android.location.LocationListener;
 
 public class MainActivity extends Activity {
 
@@ -33,6 +35,8 @@ public class MainActivity extends Activity {
 	/* Oraingo ordutik zenbat segundu atzera begiratuko diren autobusak */
 	private static int MIN_BUS_STOP_TIME = 300; // 5min
 	
+	private TextView txtGeltokia;
+	
 	private Geltokia geltokiHurbilena;
 	
 	private ListView listvBidaiak;
@@ -44,8 +48,17 @@ public class MainActivity extends Activity {
 
 		// LocationManager-a erabiliko dugu GPS-a erabiltzeko
 		locManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+		List<String> zerrendaProviders = locManager.getAllProviders();
+		Criteria req = new Criteria();
+		req.setAccuracy(Criteria.ACCURACY_FINE);
+		String providerOnena = locManager.getBestProvider(req, false);
+		Log.i("consola", "Zerbitzari onena: "+providerOnena);
 		locListener = new NireLocationListener();
-		locManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locListener);
+//		locManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locListener);
+		locManager.requestLocationUpdates(providerOnena, 0, 0, locListener);
+		
+		//Geltoki izenaren trepeta lortu
+		txtGeltokia = (TextView)findViewById(R.id.txtGeltokia);
 		
 		//Bidaien zerrendaren trepeta lortu
 		listvBidaiak = (ListView)findViewById(R.id.listvBidaiak);
@@ -91,7 +104,7 @@ public class MainActivity extends Activity {
 						geltokiHurbilena = geltokiak.get(i);
 					}
 				}
-				Toast.makeText(getApplicationContext(), "Geltoki hurbilena: "+geltokiHurbilena.getName(), Toast.LENGTH_LONG).show();
+				txtGeltokia.setText(geltokiHurbilena.getName());
 				/* Geltoki horri dagozkion geldiuneak aurkitu */
 				bidaiakLortu(geltokiHurbilena.getId());
 			}

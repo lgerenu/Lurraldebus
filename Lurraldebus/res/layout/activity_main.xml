@@ -8,15 +8,6 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity" >
 
-    <Button
-        android:id="@+id/btnGeltokiaLortu"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="28dp"
-        android:text="Geltokia lortu" />
-
     <ListView
         android:id="@+id/listvBidaiak"
         android:layout_width="match_parent"
@@ -24,5 +15,24 @@
         android:layout_below="@+id/btnGeltokiaLortu"
         android:layout_centerHorizontal="true" >
     </ListView>
+
+    <Button
+        android:id="@+id/btnGeltokiaLortu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/listvBidaiak"
+        android:layout_alignParentTop="true"
+        android:text="Geltokia lortu" />
+
+    <TextView
+        android:id="@+id/txtGeltokia"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/btnGeltokiaLortu"
+        android:layout_alignBottom="@+id/btnGeltokiaLortu"
+        android:layout_alignRight="@+id/listvBidaiak"
+        android:layout_toRightOf="@+id/btnGeltokiaLortu"
+        android:text="Geltokirik ez..."
+        android:textAppearance="?android:attr/textAppearanceLarge" />
 
 </RelativeLayout>
