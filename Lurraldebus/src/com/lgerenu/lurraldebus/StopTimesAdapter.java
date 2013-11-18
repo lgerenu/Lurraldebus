@@ -45,6 +45,7 @@ public class StopTimesAdapter extends BaseAdapter {
 			contenedor = new ContenedorView();
 			contenedor.bidaia = (TextView) arg1.findViewById(R.id.bidaia);
 			contenedor.ordua = (TextView) arg1.findViewById(R.id.ordua);
+			contenedor.hurrengoGeltokia = (TextView) arg1.findViewById(R.id.hurrengoGeltokia);
 
 			arg1.setTag(contenedor);
 		} else
@@ -60,6 +61,7 @@ public class StopTimesAdapter extends BaseAdapter {
 	class ContenedorView {
 		TextView bidaia;
 		TextView ordua;
+		TextView hurrengoGeltokia;
 	}
 
 }

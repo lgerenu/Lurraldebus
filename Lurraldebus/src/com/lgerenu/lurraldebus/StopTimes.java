@@ -10,8 +10,9 @@ public class StopTimes {
 	private int departureTimeSeconds;
 	private int route_id;
 	private String routeIzena;
+	private int service_id;
 	
-	public StopTimes(int id, String arrivalTime, String departureTime, int stopId, int stopSequence, int arrivalTimeSeconds, int departureTimeSeconds, int route_id, String routeIzena){
+	public StopTimes(int id, String arrivalTime, String departureTime, int stopId, int stopSequence, int arrivalTimeSeconds, int departureTimeSeconds, int route_id, String routeIzena, int service_id){
 		this.setId(id);
 		this.setArrivalTime(arrivalTime); 
 		this.setDepartureTime(departureTime);
@@ -21,6 +22,7 @@ public class StopTimes {
 		this.setDepartureTimeSeconds(departureTimeSeconds);
 		this.setRoute_id(route_id);
 		this.setRouteIzena(routeIzena);
+		this.setService_id(service_id);
 	}
 
 	/**
@@ -149,6 +151,20 @@ public class StopTimes {
 	 */
 	public void setRouteIzena(String routeIzena) {
 		this.routeIzena = routeIzena;
+	}
+
+	/**
+	 * @return the service_id
+	 */
+	public int getService_id() {
+		return service_id;
+	}
+
+	/**
+	 * @param service_id the service_id to set
+	 */
+	public void setService_id(int service_id) {
+		this.service_id = service_id;
 	}
 
 }

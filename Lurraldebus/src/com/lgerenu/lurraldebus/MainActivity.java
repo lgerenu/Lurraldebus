@@ -31,7 +31,7 @@ public class MainActivity extends Activity {
 	private static double MAX_LON_DIFF = 0.05;
 	
 	/* Oraingo ordutik zenbat segundu aurrera begiratuko diren autobusak */
-	private static int MAX_BUS_STOP_TIME = 3600; // 1h
+	private static int MAX_BUS_STOP_TIME = 3600; // 1:00h
 	/* Oraingo ordutik zenbat segundu atzera begiratuko diren autobusak */
 	private static int MIN_BUS_STOP_TIME = 300; // 5min
 	
