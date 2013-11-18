@@ -11,8 +11,9 @@ public class StopTimes {
 	private int route_id;
 	private String routeIzena;
 	private int service_id;
+	private String hurrengoGeltokiak;
 	
-	public StopTimes(int id, String arrivalTime, String departureTime, int stopId, int stopSequence, int arrivalTimeSeconds, int departureTimeSeconds, int route_id, String routeIzena, int service_id){
+	public StopTimes(int id, String arrivalTime, String departureTime, int stopId, int stopSequence, int arrivalTimeSeconds, int departureTimeSeconds, int route_id, String routeIzena, int service_id, String hurrengoGeltokiak){
 		this.setId(id);
 		this.setArrivalTime(arrivalTime); 
 		this.setDepartureTime(departureTime);
@@ -23,6 +24,7 @@ public class StopTimes {
 		this.setRoute_id(route_id);
 		this.setRouteIzena(routeIzena);
 		this.setService_id(service_id);
+		this.setHurrengoGeltokiak(hurrengoGeltokiak);
 	}
 
 	/**
@@ -165,6 +167,20 @@ public class StopTimes {
 	 */
 	public void setService_id(int service_id) {
 		this.service_id = service_id;
+	}
+
+	/**
+	 * @return the hurrengoGeltokiak
+	 */
+	public String getHurrengoGeltokiak() {
+		return hurrengoGeltokiak;
+	}
+
+	/**
+	 * @param hurrengoGeltokiak the hurrengoGeltokiak to set
+	 */
+	public void setHurrengoGeltokiak(String hurrengoGeltokiak) {
+		this.hurrengoGeltokiak = hurrengoGeltokiak;
 	}
 
 }

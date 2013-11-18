@@ -3,6 +3,7 @@ package com.lgerenu.lurraldebus;
 import java.util.List;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,7 +46,7 @@ public class StopTimesAdapter extends BaseAdapter {
 			contenedor = new ContenedorView();
 			contenedor.bidaia = (TextView) arg1.findViewById(R.id.bidaia);
 			contenedor.ordua = (TextView) arg1.findViewById(R.id.ordua);
-			contenedor.hurrengoGeltokia = (TextView) arg1.findViewById(R.id.hurrengoGeltokia);
+			contenedor.hurrengoGeltokiak = (TextView) arg1.findViewById(R.id.hurrengoGeltokiak);
 
 			arg1.setTag(contenedor);
 		} else
@@ -53,7 +54,12 @@ public class StopTimesAdapter extends BaseAdapter {
 		
 		StopTimes geldiuneak = (StopTimes) getItem(arg0);
 		contenedor.bidaia.setText(geldiuneak.getRouteIzena());
+		contenedor.bidaia.setTextColor(Color.GRAY);
 		contenedor.ordua.setText(geldiuneak.getArrivalTime());
+		contenedor.ordua.setTextColor(Color.BLACK);
+		contenedor.ordua.setBackgroundColor(Color.GRAY);
+		contenedor.hurrengoGeltokiak.setText(geldiuneak.getHurrengoGeltokiak());
+		contenedor.hurrengoGeltokiak.setTextColor(Color.BLACK);
 
 		return arg1;
 	}
@@ -61,7 +67,7 @@ public class StopTimesAdapter extends BaseAdapter {
 	class ContenedorView {
 		TextView bidaia;
 		TextView ordua;
-		TextView hurrengoGeltokia;
+		TextView hurrengoGeltokiak;
 	}
 
 }

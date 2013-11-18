@@ -166,7 +166,7 @@ public class DBHelper extends SQLiteOpenHelper {
 		do {
 			int route_id = routeLortu(c.getInt(0));
 			int service_id = serviceLortu(c.getInt(0)); 
-			StopTimes geldiunea = new StopTimes(c.getInt(0), c.getString(1), c.getString(2), c.getInt(3), c.getInt(4), c.getInt(5), c.getInt(6), route_id, routeIzenaLortu(route_id), service_id);
+			StopTimes geldiunea = new StopTimes(c.getInt(0), c.getString(1), c.getString(2), c.getInt(3), c.getInt(4), c.getInt(5), c.getInt(6), route_id, routeIzenaLortu(route_id), service_id, "");
 			// Begiratu ia gaurko bidaiak diren
 			//TODO gaurko datarekin alderatu
 			if(gaurDaBidaia(data, service_id)) {
@@ -218,6 +218,18 @@ public class DBHelper extends SQLiteOpenHelper {
 		return route_izena;
 	}
 
+	public String stopIzenaLortu(int stop_id) {
+		SQLiteDatabase db = getReadableDatabase();
+		String[] irakurtzekoDatuak = {"stop_name"};
+		String baldintzak = "stop_id="+stop_id;
+		Cursor c = db.query("gtfs_stops", irakurtzekoDatuak, baldintzak, null, null, null, null, null);
+		c.moveToFirst();
+		String stop_izena = c.getString(0);
+		db.close();
+		c.close();
+		return stop_izena;
+	}
+
 	public boolean gaurDaBidaia(String gaurkoData, int service_id) {
 		SQLiteDatabase db = getReadableDatabase();
 		String[] irakurtzekoDatuak = {"service_id", "date"};
@@ -229,6 +241,27 @@ public class DBHelper extends SQLiteOpenHelper {
 			return true;
 		else
 			return false;
+	}
+
+	public String hurrengoGeltokiakLortu(int trip_id, int stop_id) {
+		String hurrengoGeltokiak = "";
+		SQLiteDatabase db = getReadableDatabase();
+		String[] irakurtzekoDatuak = {"stop_id", "stop_sequence"};
+		String baldintzak = "trip_id="+trip_id;
+		Cursor c = db.query("gtfs_stop_times", irakurtzekoDatuak, baldintzak, null, null, null, "stop_sequence", null);
+		c.moveToFirst();
+		boolean hurrengoaBai = false;
+		do {
+			if(c.getInt(0) == stop_id)
+				hurrengoaBai = true;
+			else if(hurrengoaBai) {
+				String geltokiIzena = stopIzenaLortu(c.getInt(0));
+				if(!hurrengoGeltokiak.isEmpty())
+					hurrengoGeltokiak += ", "; 
+				hurrengoGeltokiak += geltokiIzena;
+			}
+		} while(c.moveToNext());
+		return hurrengoGeltokiak;	
 	}
 
 	@Override

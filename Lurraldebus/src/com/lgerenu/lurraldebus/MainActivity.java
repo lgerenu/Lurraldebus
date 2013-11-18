@@ -2,6 +2,7 @@ package com.lgerenu.lurraldebus;
 
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.Iterator;
 import java.util.List;
 
 import android.app.Activity;
@@ -29,17 +30,19 @@ public class MainActivity extends Activity {
 	private static double MAX_LAT_DIFF = 0.05;
 	/* Longitudean dagoen diferentziarik handiena geltoki hurbilena aurkitzeko */
 	private static double MAX_LON_DIFF = 0.05;
-	
+
 	/* Oraingo ordutik zenbat segundu aurrera begiratuko diren autobusak */
 	private static int MAX_BUS_STOP_TIME = 3600; // 1:00h
 	/* Oraingo ordutik zenbat segundu atzera begiratuko diren autobusak */
 	private static int MIN_BUS_STOP_TIME = 300; // 5min
-	
+
 	private TextView txtGeltokia;
-	
+
 	private Geltokia geltokiHurbilena;
-	
+
 	private ListView listvBidaiak;
+
+	private List<StopTimes> geldiuneak; //Geltoki hurbilenean dauden geldiuneak ordu zehatz batzuen artean.
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -54,12 +57,11 @@ public class MainActivity extends Activity {
 		String providerOnena = locManager.getBestProvider(req, false);
 		Log.i("consola", "Zerbitzari onena: "+providerOnena);
 		locListener = new NireLocationListener();
-//		locManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locListener);
 		locManager.requestLocationUpdates(providerOnena, 0, 0, locListener);
-		
+
 		//Geltoki izenaren trepeta lortu
 		txtGeltokia = (TextView)findViewById(R.id.txtGeltokia);
-		
+
 		//Bidaien zerrendaren trepeta lortu
 		listvBidaiak = (ListView)findViewById(R.id.listvBidaiak);
 
@@ -74,7 +76,7 @@ public class MainActivity extends Activity {
 			e.printStackTrace();
 		}
 
-		
+
 		/**
 		 * Geltokia lortzeko botoia
 		 */
@@ -106,33 +108,58 @@ public class MainActivity extends Activity {
 				}
 				txtGeltokia.setText(geltokiHurbilena.getName());
 				/* Geltoki horri dagozkion geldiuneak aurkitu */
-				bidaiakLortu(geltokiHurbilena.getId());
+				geldiuneak = bidaiakLortu(geltokiHurbilena.getId());
+				StopTimesAdapter geldiuneAdapter = new StopTimesAdapter(getApplicationContext(), geldiuneak);
+				geldiuneAdapter.getView(0, null, null);
+				listvBidaiak.setAdapter(geldiuneAdapter);
+				Iterator<StopTimes> iter = geldiuneak.iterator();
+				Log.i("consola", "Hurrengo geltokiak bilatzen...");
+				for(int i=0; i<geldiuneak.size(); i++) {
+					Log.i("consola", "i="+i+" trip_id="+geldiuneak.get(i).getId()+" stop_id="+geldiuneak.get(i).getStopId());
+					String buff = hurrengoGeltokiakLortu(geldiuneak.get(i).getId(), geldiuneak.get(i).getStopId());
+					geldiuneak.get(i).setHurrengoGeltokiak(buff);
+				}
+				geldiuneAdapter.getView(0, null, null);
+				listvBidaiak.setAdapter(geldiuneAdapter);
 			}
 		});
 
 	}
-	
+
 	/**
-	 * 
+	 * Geltoki batean ordu tarte batean gertatzen diren geldiuneak lortu.
 	 * @param geltokiaId
+	 * @return
 	 */
-	private void bidaiakLortu(int geltokiaId) {
+	private List<StopTimes> bidaiakLortu(int geltokiaId) {
 		/* Datu base ireki */
 		datuBasea.openDataBase();
 		/* Uneko ordua eta eguna lortu */
 		Calendar dataOrdua = Calendar.getInstance();
 		int orduaSegundutan = getDayTimeSeconds(dataOrdua.get(dataOrdua.HOUR_OF_DAY), dataOrdua.get(dataOrdua.MINUTE), dataOrdua.get(dataOrdua.SECOND));
-//		orduaSegundutan = 46800; // 13:00:00ak direla simulatzeko
+		//orduaSegundutan = 46800; // 13:00:00ak direla simulatzeko
 		/* Geltoki honetako geldiuneak atera */
 		List<StopTimes> geldiuneak = datuBasea.geldialdiakIrakurri(geltokiaId, orduaSegundutan+MAX_BUS_STOP_TIME, orduaSegundutan-MIN_BUS_STOP_TIME);
 		int geldiuneKopurua = geldiuneak.size();
 		Log.i("consola", "Geldiune kopurua: "+geldiuneKopurua);
 		/* Datu basea itxi */
 		datuBasea.close();
-		StopTimesAdapter geldiuneAdapter = new StopTimesAdapter(getApplicationContext(), geldiuneak);
-		geldiuneAdapter.getView(0, null, null);
-		listvBidaiak.setAdapter(geldiuneAdapter);
-		
+		return geldiuneak;
+	}
+
+	/**
+	 * Ruta bat emanda, geltoki baten hurrengo geltokiak bilatu.
+	 * @param trip_id
+	 * @param stop_id
+	 */
+	private String hurrengoGeltokiakLortu(int trip_id, int stop_id) {
+		String hurrengoGeltokiak;
+		/* Datu base ireki */
+		datuBasea.openDataBase();
+		hurrengoGeltokiak = datuBasea.hurrengoGeltokiakLortu(trip_id, stop_id);
+		/* Datu basea itxi */
+		datuBasea.close();
+		return hurrengoGeltokiak;
 	}
 
 	/**
@@ -147,7 +174,7 @@ public class MainActivity extends Activity {
 		int segunduakGuztira = minutuakGuztira*60 + seconds;
 		return segunduakGuztira;		
 	}
-	
+
 	/**
 	 * Bi punturen arteko distantzia kalkulatzen du.
 	 * @param lat_a A puntuaren latitudea.
