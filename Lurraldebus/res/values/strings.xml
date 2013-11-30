@@ -2,7 +2,8 @@
 <resources>
 
     <string name="app_name">Lurraldebus</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_settings">Doikuntzak</string>
     <string name="hello_world">Hello world!</string>
+    <string name="action_honiburuz">Honi buruz</string>
 
 </resources>

@@ -6,7 +6,12 @@ import java.util.Iterator;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.app.FragmentManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -15,6 +20,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
@@ -125,7 +131,8 @@ public class MainActivity extends Activity {
 		});
 
 	}
-	
+
+
 	/**
 	 * Tarea asinkronoa. Geltokiak lortzeko kodea hemen dago, tarea
 	 * printzipala asko luzatu ez dadin.
@@ -228,6 +235,40 @@ public class MainActivity extends Activity {
 
 	}
 
+	/**
+	 * Aplikazio honi buruzko lehioa ateratzen du pantailan.
+	 */
+	public void showHelp() {
+		FragmentManager fragmentManager = getFragmentManager();
+		HoniBuruzLehioa honiBuruz = new HoniBuruzLehioa();
+		honiBuruz.show(fragmentManager, "tag_alerta");
+	}
+
+	/**
+	 * Aplikazio honi buruzko lehioa definitzen duen klasea.
+	 * @author lander
+	 *
+	 */
+	public class HoniBuruzLehioa extends DialogFragment {
+		@Override
+		public Dialog onCreateDialog(Bundle savedInstanceState) {
+
+			AlertDialog.Builder builder =
+					new AlertDialog.Builder(getActivity());
+
+			builder.setMessage("Hurbilen dagoen geltokia lortu eta hurrengo autobusak zeintzuk diren erakusten du.")
+			.setTitle("Honi buruz...")
+			.setPositiveButton("Ados", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					dialog.cancel();
+				}
+			});
+
+			return builder.create();
+		}
+	}
+
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -235,12 +276,29 @@ public class MainActivity extends Activity {
 		return true;
 	}
 
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle item selection
+		switch (item.getItemId()) {
+		case R.id.action_settings:
+			//	            newGame();
+			return true;
+		case R.id.action_honiburuz:
+			showHelp();
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+	}
 
 
+	/**
+	 * GPSa erabili ahal izateko klasea.
+	 * @author lander
+	 *
+	 */
 	public class NireLocationListener implements LocationListener
-
 	{
-
 		public void onLocationChanged(Location loc)
 
 		{
