@@ -11,6 +11,7 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -96,6 +97,8 @@ public class MainActivity extends Activity {
 				datuBasea.close();
 				/* Aukeratutako geltoki kopurua lortu */
 				int geltokiKopurua = geltokiak.size();
+				/* Geltokirik aurkitu denentz jakiteko aldagaia */
+				boolean geltokiaAurkituta = false;
 				/* Hurbilen dagoen geltokia aukeratu */
 				int azkenDistantzia = 10000; // 10 Km.
 				for(int i=0; i<geltokiKopurua; i++) {
@@ -104,11 +107,61 @@ public class MainActivity extends Activity {
 					if (distantzia < azkenDistantzia) {
 						azkenDistantzia = distantzia;
 						geltokiHurbilena = geltokiak.get(i);
+						geltokiaAurkituta = true; // Geltoki bat behintzat...
 					}
 				}
-				txtGeltokia.setText(geltokiHurbilena.getName());
-				/* Geltoki horri dagozkion geldiuneak aurkitu */
-				geldiuneak = bidaiakLortu(geltokiHurbilena.getId());
+				if(geltokiaAurkituta) {
+					txtGeltokia.setText(geltokiHurbilena.getName());
+					/* Geltoki horri dagozkion geldiuneak aurkitu */
+					bkgndHurrengoGeltokiakAurkitu task1 = new bkgndHurrengoGeltokiakAurkitu();
+					int[] geltokiHurbilenaId = {0};
+					geltokiHurbilenaId[0] = geltokiHurbilena.getId();
+					task1.execute(geltokiHurbilenaId[0]);
+				}
+				else {
+					txtGeltokia.setText("Ez dago geltokirik inguruan...");
+				}
+			}
+		});
+
+	}
+	
+	/**
+	 * Tarea asinkronoa. Geltokiak lortzeko kodea hemen dago, tarea
+	 * printzipala asko luzatu ez dadin.
+	 * @author lander
+	 *
+	 */
+	private class bkgndHurrengoGeltokiakAurkitu extends AsyncTask<Integer, Void, List<StopTimes>>
+	{
+		@Override
+		protected void onPreExecute() {
+
+		}
+
+		@Override
+		protected List<StopTimes> doInBackground(Integer... geltokiaId) {
+			int geltokiHurbilenareId = geltokiaId[0];
+			/* Datu base ireki */
+			datuBasea.openDataBase();
+			/* Uneko ordua eta eguna lortu */
+			Calendar dataOrdua = Calendar.getInstance();
+			int orduaSegundutan = getDayTimeSeconds(dataOrdua.get(dataOrdua.HOUR_OF_DAY), dataOrdua.get(dataOrdua.MINUTE), dataOrdua.get(dataOrdua.SECOND));
+			//orduaSegundutan = 46800; // 13:00:00ak direla simulatzeko
+			//orduaSegundutan = 0; // 00:00:00ak direla simulatzeko
+			/* Geltoki honetako geldiuneak atera */
+			List<StopTimes> geldiuneak = datuBasea.geldialdiakIrakurri(geltokiHurbilenareId, orduaSegundutan+MAX_BUS_STOP_TIME, orduaSegundutan-MIN_BUS_STOP_TIME);
+			int geldiuneKopurua = geldiuneak.size();
+			Log.i("consola", "Geldiune kopurua: "+geldiuneKopurua);
+			/* Datu basea itxi */
+			datuBasea.close();
+			return geldiuneak;
+		}
+
+		@Override
+		protected void onPostExecute(List<StopTimes> geldiuneak) {
+
+			if(geldiuneak.size() > 0) {
 				StopTimesAdapter geldiuneAdapter = new StopTimesAdapter(getApplicationContext(), geldiuneak);
 				geldiuneAdapter.getView(0, null, null);
 				listvBidaiak.setAdapter(geldiuneAdapter);
@@ -122,29 +175,7 @@ public class MainActivity extends Activity {
 				geldiuneAdapter.getView(0, null, null);
 				listvBidaiak.setAdapter(geldiuneAdapter);
 			}
-		});
-
-	}
-
-	/**
-	 * Geltoki batean ordu tarte batean gertatzen diren geldiuneak lortu.
-	 * @param geltokiaId
-	 * @return
-	 */
-	private List<StopTimes> bidaiakLortu(int geltokiaId) {
-		/* Datu base ireki */
-		datuBasea.openDataBase();
-		/* Uneko ordua eta eguna lortu */
-		Calendar dataOrdua = Calendar.getInstance();
-		int orduaSegundutan = getDayTimeSeconds(dataOrdua.get(dataOrdua.HOUR_OF_DAY), dataOrdua.get(dataOrdua.MINUTE), dataOrdua.get(dataOrdua.SECOND));
-		//orduaSegundutan = 46800; // 13:00:00ak direla simulatzeko
-		/* Geltoki honetako geldiuneak atera */
-		List<StopTimes> geldiuneak = datuBasea.geldialdiakIrakurri(geltokiaId, orduaSegundutan+MAX_BUS_STOP_TIME, orduaSegundutan-MIN_BUS_STOP_TIME);
-		int geldiuneKopurua = geldiuneak.size();
-		Log.i("consola", "Geldiune kopurua: "+geldiuneKopurua);
-		/* Datu basea itxi */
-		datuBasea.close();
-		return geldiuneak;
+		}
 	}
 
 	/**

@@ -163,20 +163,22 @@ public class DBHelper extends SQLiteOpenHelper {
 		String baldintzak = "stop_id="+geltokiaId+" AND arrival_time_seconds>"+minOrduaSeg+" AND arrival_time_seconds<"+maxOrduaSeg;
 		Cursor c = db.query("gtfs_stop_times", irakurtzekoDatuak, baldintzak, null, null, null, "arrival_time_seconds", null);
 		c.moveToFirst();
-		do {
-			int route_id = routeLortu(c.getInt(0));
-			int service_id = serviceLortu(c.getInt(0)); 
-			StopTimes geldiunea = new StopTimes(c.getInt(0), c.getString(1), c.getString(2), c.getInt(3), c.getInt(4), c.getInt(5), c.getInt(6), route_id, routeIzenaLortu(route_id), service_id, "");
-			// Begiratu ia gaurko bidaiak diren
-			//TODO gaurko datarekin alderatu
-			if(gaurDaBidaia(data, service_id)) {
-				Log.i("consola", "Gaurko bidaia da.");
-				zerrendaGeldiuneak.add(geldiunea);
-			}
-			else {
-				Log.i("consola", "Ez da gaurko bidaia");
-			}
-		} while (c.moveToNext());
+		if(c.getCount() > 0) {
+			do {
+				int route_id = routeLortu(c.getInt(0));
+				int service_id = serviceLortu(c.getInt(0)); 
+				StopTimes geldiunea = new StopTimes(c.getInt(0), c.getString(1), c.getString(2), c.getInt(3), c.getInt(4), c.getInt(5), c.getInt(6), route_id, routeIzenaLortu(route_id), service_id, "");
+				// Begiratu ia gaurko bidaiak diren
+				//TODO gaurko datarekin alderatu
+				if(gaurDaBidaia(data, service_id)) {
+					Log.i("consola", "Gaurko bidaia da.");
+					zerrendaGeldiuneak.add(geldiunea);
+				}
+				else {
+					Log.i("consola", "Ez da gaurko bidaia");
+				}
+			} while (c.moveToNext());
+		}
 		db.close();
 		c.close();
 		return zerrendaGeldiuneak;
