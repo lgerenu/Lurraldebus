@@ -182,6 +182,9 @@ public class MainActivity extends Activity {
 				geldiuneAdapter.getView(0, null, null);
 				listvBidaiak.setAdapter(geldiuneAdapter);
 			}
+			else {
+				Toast.makeText( getApplicationContext(),"Ez da autobusik aurkitu",Toast.LENGTH_LONG).show();
+			}
 		}
 	}
 
@@ -307,11 +310,11 @@ public class MainActivity extends Activity {
 		}
 		public void onProviderDisabled(String provider)
 		{
-			Toast.makeText( getApplicationContext(),"GPSa ez dago erabilgarri",Toast.LENGTH_SHORT ).show();
+			Toast.makeText( getApplicationContext(),"GPSa ez dago erabilgarri",Toast.LENGTH_SHORT).show();
 		}
 		public void onProviderEnabled(String provider)
 		{
-			Toast.makeText( getApplicationContext(),"GPSa erabilgarri dago",Toast.LENGTH_SHORT ).show();
+			Toast.makeText( getApplicationContext(),"GPSa erabilgarri dago",Toast.LENGTH_SHORT).show();
 		}
 		public void onStatusChanged(String provider, int status, Bundle extras){}
 
