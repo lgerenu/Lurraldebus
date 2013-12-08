@@ -7,5 +7,7 @@
     <string name="settings_hurrunera">Distantzia hau baina hurbilago dauden geltokiak bilatu (metrotan)</string>
     <string name="settings_save">Ezarpenak gorde</string>
     <string name="settings_no_save">Aldaketak baztertu</string>
+    <string name="settings_hasierako_ordua">Oraingo ordua baino minutu hauek lehenago hasi autobusak begiratzen</string>
+    <string name="settings_bukaerako_ordua">Oraingo ordutik minutu hauek pasatu arte begiratu autobusak</string>
 
 </resources>

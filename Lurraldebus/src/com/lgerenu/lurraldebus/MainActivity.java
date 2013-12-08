@@ -53,6 +53,8 @@ public class MainActivity extends Activity {
 	/* Ezarpenak */
 	private Ezarpenak ezarpenak; // Ezarpenak gordetzeko klasea
 	private int hurrunera; //Geltoki hurbilenak bilatzeko gehiengo distantzia
+	private int hasieraOrdua; //AUtobusak bilatzen hasteko oraingo ordua baino zenbat minutu lehenago hasi
+	private int bukaeraOrdua; //AUtobusak bilatzen bukatzeko oraingo ordua baino zenbat minutu beranduago hasi
 
 	private List<StopTimes> geldiuneak; //Geltoki hurbilenean dauden geldiuneak ordu zehatz batzuen artean.
 
@@ -84,6 +86,10 @@ public class MainActivity extends Activity {
 		//Gordetako datuak lortu, baldin badaude
 		if(ezarpenak.getHurrunera() != 0)
 			hurrunera = Integer.valueOf(ezarpenak.getHurrunera());
+		if(ezarpenak.getHasieraOrdua() != 0)
+			hasieraOrdua = Integer.valueOf(ezarpenak.getHasieraOrdua());
+		if(ezarpenak.getBukaeraOrdua() != 0)
+			bukaeraOrdua = Integer.valueOf(ezarpenak.getBukaeraOrdua());
 
 
 		/*
@@ -105,6 +111,11 @@ public class MainActivity extends Activity {
 		btnGeltokiaLortu.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				/* Botoia ezgaitu */
+				Button btnGeltokiaLortu = (Button) findViewById(R.id.btnGeltokiaLortu);
+				btnGeltokiaLortu.setEnabled(false);
+				/* Zerrenda hustu */
+				listvBidaiak.setAdapter(null);
 				/* Datu base ireki */
 				datuBasea.openDataBase();
 				/* Nire kokapena zehaztu */
@@ -139,6 +150,8 @@ public class MainActivity extends Activity {
 					task1.execute(geltokiHurbilenaId[0]);
 				}
 				else {
+					/* Gaitu berriro botoia */
+					btnGeltokiaLortu.setEnabled(true);
 					txtGeltokia.setText("Ez dago geltokirik inguruan...");
 				}
 			}
@@ -157,6 +170,10 @@ public class MainActivity extends Activity {
 		//Gordetako datuak lortu, baldin badaude
 		if(ezarpenak.getHurrunera() != 0)
 			hurrunera = Integer.valueOf(ezarpenak.getHurrunera());
+		if(ezarpenak.getHasieraOrdua() != 0)
+			hasieraOrdua = Integer.valueOf(ezarpenak.getHasieraOrdua());
+		if(ezarpenak.getBukaeraOrdua() != 0)
+			bukaeraOrdua = Integer.valueOf(ezarpenak.getBukaeraOrdua());
 
 	}
 
@@ -185,7 +202,8 @@ public class MainActivity extends Activity {
 			//orduaSegundutan = 46800; // 13:00:00ak direla simulatzeko
 			//orduaSegundutan = 0; // 00:00:00ak direla simulatzeko
 			/* Geltoki honetako geldiuneak atera */
-			List<StopTimes> geldiuneak = datuBasea.geldialdiakIrakurri(geltokiHurbilenareId, orduaSegundutan+MAX_BUS_STOP_TIME, orduaSegundutan-MIN_BUS_STOP_TIME);
+			Log.i("consola", "Hasiera ordua: "+hasieraOrdua+" Bukaera ordua: "+bukaeraOrdua+" Ordua segundotan: "+orduaSegundutan);
+			List<StopTimes> geldiuneak = datuBasea.geldialdiakIrakurri(geltokiHurbilenareId, orduaSegundutan+bukaeraOrdua*60, orduaSegundutan-hasieraOrdua*60);
 			int geldiuneKopurua = geldiuneak.size();
 			Log.i("consola", "Geldiune kopurua: "+geldiuneKopurua);
 			/* Datu basea itxi */
@@ -210,6 +228,9 @@ public class MainActivity extends Activity {
 			else {
 				Toast.makeText( getApplicationContext(),"Ez da autobusik aurkitu",Toast.LENGTH_LONG).show();
 			}
+			/* Gaitu berriro botoia */
+			Button btnGeltokiaLortu = (Button)findViewById(R.id.btnGeltokiaLortu);
+			btnGeltokiaLortu.setEnabled(true);
 		}
 	}
 

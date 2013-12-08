@@ -27,6 +27,10 @@ public class SettingsActivity extends Activity {
 		 */
 		final EditText editHurrunera = (EditText) findViewById(R.id.editHurrunera);
 		editHurrunera.setText(String.valueOf(ezarpenak.getHurrunera()));
+		final EditText editHasieraOrdua = (EditText) findViewById(R.id.editHasieraOrdua);
+		editHasieraOrdua.setText(String.valueOf(ezarpenak.getHasieraOrdua()));
+		final EditText editBukaeraOrdua = (EditText) findViewById(R.id.editBukaeraOrdua);
+		editBukaeraOrdua.setText(String.valueOf(ezarpenak.getBukaeraOrdua()));
 
 		/*
 		 * Ezarpenak gordetzeko botoia
@@ -39,7 +43,11 @@ public class SettingsActivity extends Activity {
 				 * Ezarpenak gorde
 				 */
 				String hurrunera = editHurrunera.getText().toString();
-				ezarpenak.setUserEmail(Integer.valueOf(hurrunera));
+				ezarpenak.setHurrunera(Integer.valueOf(hurrunera));
+				String hasieraOrdua = editHasieraOrdua.getText().toString();
+				ezarpenak.setHasieraOrdua(Integer.valueOf(hasieraOrdua));
+				String bukaeraOrdua = editBukaeraOrdua.getText().toString();
+				ezarpenak.setBukaeraOrdua(Integer.valueOf(bukaeraOrdua));
 
 				/*
 				 * Activity-a bukatu

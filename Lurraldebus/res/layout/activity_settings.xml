@@ -39,4 +39,46 @@
         android:layout_alignParentRight="true"
         android:text="@string/settings_no_save" />
 
+    <TextView
+        android:id="@+id/TextView01"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:text="@string/settings_hurrunera" />
+
+    <EditText
+        android:id="@+id/editHasieraOrdua"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/textHasieraOrdua"
+        android:ems="10"
+        android:inputType="number" />
+
+    <TextView
+        android:id="@+id/textHasieraOrdua"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/editHurrunera"
+        android:text="@string/settings_hasierako_ordua" />
+
+    <TextView
+        android:id="@+id/textBukaeraOrdua"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/editHasieraOrdua"
+        android:text="@string/settings_bukaerako_ordua" />
+
+    <EditText
+        android:id="@+id/editBukaeraOrdua"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/textBukaeraOrdua"
+        android:ems="10"
+        android:inputType="number" />
+
 </RelativeLayout>
