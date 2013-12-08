@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Lurraldebus</string>
-    <string name="action_settings">Doikuntzak</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="app_name">Lurraldebus Pesa</string>
+    <string name="action_settings">Ezarpenak</string>
     <string name="action_honiburuz">Honi buruz</string>
+    <string name="settings_hurrunera">Distantzia hau baina hurbilago dauden geltokiak bilatu (metrotan)</string>
+    <string name="settings_save">Ezarpenak gorde</string>
+    <string name="settings_no_save">Aldaketak baztertu</string>
 
 </resources>

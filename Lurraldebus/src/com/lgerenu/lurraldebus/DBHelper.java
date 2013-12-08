@@ -8,7 +8,6 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -169,7 +168,6 @@ public class DBHelper extends SQLiteOpenHelper {
 				int service_id = serviceLortu(c.getInt(0)); 
 				StopTimes geldiunea = new StopTimes(c.getInt(0), c.getString(1), c.getString(2), c.getInt(3), c.getInt(4), c.getInt(5), c.getInt(6), route_id, routeIzenaLortu(route_id), service_id, "");
 				// Begiratu ia gaurko bidaiak diren
-				//TODO gaurko datarekin alderatu
 				if(gaurDaBidaia(data, service_id)) {
 					Log.i("consola", "Gaurko bidaia da.");
 					zerrendaGeldiuneak.add(geldiunea);
@@ -259,7 +257,7 @@ public class DBHelper extends SQLiteOpenHelper {
 			else if(hurrengoaBai) {
 				String geltokiIzena = stopIzenaLortu(c.getInt(0));
 				if(!hurrengoGeltokiak.isEmpty())
-					hurrengoGeltokiak += ", "; 
+					hurrengoGeltokiak += "->"; 
 				hurrengoGeltokiak += geltokiIzena;
 			}
 		} while(c.moveToNext());

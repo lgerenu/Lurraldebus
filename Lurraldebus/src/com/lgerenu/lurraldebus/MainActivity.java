@@ -12,6 +12,7 @@ import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -49,6 +50,10 @@ public class MainActivity extends Activity {
 
 	private ListView listvBidaiak;
 
+	/* Ezarpenak */
+	private Ezarpenak ezarpenak; // Ezarpenak gordetzeko klasea
+	private int hurrunera; //Geltoki hurbilenak bilatzeko gehiengo distantzia
+
 	private List<StopTimes> geldiuneak; //Geltoki hurbilenean dauden geldiuneak ordu zehatz batzuen artean.
 
 	@Override
@@ -71,6 +76,15 @@ public class MainActivity extends Activity {
 
 		//Bidaien zerrendaren trepeta lortu
 		listvBidaiak = (ListView)findViewById(R.id.listvBidaiak);
+
+		/*
+		 * Ezarpenak
+		 */
+		ezarpenak = new Ezarpenak(this);
+		//Gordetako datuak lortu, baldin badaude
+		if(ezarpenak.getHurrunera() != 0)
+			hurrunera = Integer.valueOf(ezarpenak.getHurrunera());
+
 
 		/*
 		 * Sortu datu basea
@@ -106,7 +120,7 @@ public class MainActivity extends Activity {
 				/* Geltokirik aurkitu denentz jakiteko aldagaia */
 				boolean geltokiaAurkituta = false;
 				/* Hurbilen dagoen geltokia aukeratu */
-				int azkenDistantzia = 10000; // 10 Km.
+				int azkenDistantzia = hurrunera;
 				for(int i=0; i<geltokiKopurua; i++) {
 					int distantzia = getDistance(actLat, actLon,
 							geltokiak.get(i).getLat(), geltokiak.get(i).getLon()); 
@@ -129,6 +143,20 @@ public class MainActivity extends Activity {
 				}
 			}
 		});
+
+	}
+
+
+	/**
+	 * Activity-a berriro hastean, gordetako datuak berreskuratu.
+	 */
+	@Override
+	protected void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+		//Gordetako datuak lortu, baldin badaude
+		if(ezarpenak.getHurrunera() != 0)
+			hurrunera = Integer.valueOf(ezarpenak.getHurrunera());
 
 	}
 
@@ -172,10 +200,7 @@ public class MainActivity extends Activity {
 				StopTimesAdapter geldiuneAdapter = new StopTimesAdapter(getApplicationContext(), geldiuneak);
 				geldiuneAdapter.getView(0, null, null);
 				listvBidaiak.setAdapter(geldiuneAdapter);
-				Iterator<StopTimes> iter = geldiuneak.iterator();
-				Log.i("consola", "Hurrengo geltokiak bilatzen...");
 				for(int i=0; i<geldiuneak.size(); i++) {
-					Log.i("consola", "i="+i+" trip_id="+geldiuneak.get(i).getId()+" stop_id="+geldiuneak.get(i).getStopId());
 					String buff = hurrengoGeltokiakLortu(geldiuneak.get(i).getId(), geldiuneak.get(i).getStopId());
 					geldiuneak.get(i).setHurrengoGeltokiak(buff);
 				}
@@ -248,6 +273,14 @@ public class MainActivity extends Activity {
 	}
 
 	/**
+	 * Ezarpenetara joateko funtzioa.
+	 */
+	public void gotoSettings() {
+		Intent i = new Intent(this, SettingsActivity.class);
+		startActivity(i);
+	}
+
+	/**
 	 * Aplikazio honi buruzko lehioa definitzen duen klasea.
 	 * @author lander
 	 *
@@ -284,7 +317,7 @@ public class MainActivity extends Activity {
 		// Handle item selection
 		switch (item.getItemId()) {
 		case R.id.action_settings:
-			//	            newGame();
+			gotoSettings();
 			return true;
 		case R.id.action_honiburuz:
 			showHelp();
