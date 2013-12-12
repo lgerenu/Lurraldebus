@@ -134,7 +134,8 @@ public class DBHelper extends SQLiteOpenHelper {
 		Cursor c = db.rawQuery(query, null);
 		c.moveToFirst();
 		do {
-			Geltokia geltokia = new Geltokia(c.getInt(0), c.getString(1), c.getString(2), c.getDouble(3), c.getDouble(4));
+			Log.i("consola", "DBHelper->geltoki berria...");
+			Geltokia geltokia = new Geltokia(c.getInt(0), c.getString(1), c.getString(2), c.getDouble(3), c.getDouble(4), 0);
 			zerrendaGeltokiak.add(geltokia);
 		} while (c.moveToNext());
 		db.close();

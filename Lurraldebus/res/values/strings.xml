@@ -9,5 +9,7 @@
     <string name="settings_no_save">Aldaketak baztertu</string>
     <string name="settings_hasierako_ordua">Oraingo ordua baino minutu hauek lehenago hasi autobusak begiratzen</string>
     <string name="settings_bukaerako_ordua">Oraingo ordutik minutu hauek pasatu arte begiratu autobusak</string>
+    <string name="geltokiak_irten">Irten</string>
+    <string name="action_geltokia">Inguruko geltokiak</string>
 
 </resources>

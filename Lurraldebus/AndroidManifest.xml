@@ -25,6 +25,7 @@
             </intent-filter>
         </activity>
         <activity android:name="SettingsActivity"></activity>
+        <activity android:name="com.lgerenu.lurraldebus.GeltokiakActivity"></activity>
     </application>
 
 </manifest>

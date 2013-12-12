@@ -52,11 +52,18 @@ public class MainActivity extends Activity {
 
 	/* Ezarpenak */
 	private Ezarpenak ezarpenak; // Ezarpenak gordetzeko klasea
-	private int hurrunera; //Geltoki hurbilenak bilatzeko gehiengo distantzia
-	private int hasieraOrdua; //AUtobusak bilatzen hasteko oraingo ordua baino zenbat minutu lehenago hasi
-	private int bukaeraOrdua; //AUtobusak bilatzen bukatzeko oraingo ordua baino zenbat minutu beranduago hasi
+	private int hurrunera; // Geltoki hurbilenak bilatzeko gehiengo distantzia
+	private int hasieraOrdua; // AUtobusak bilatzen hasteko oraingo ordua baino
+								// zenbat minutu lehenago hasi
+	private int bukaeraOrdua; // AUtobusak bilatzen bukatzeko oraingo ordua
+								// baino zenbat minutu beranduago hasi
 
-	private List<StopTimes> geldiuneak; //Geltoki hurbilenean dauden geldiuneak ordu zehatz batzuen artean.
+	private List<StopTimes> geldiuneak; // Geltoki hurbilenean dauden geldiuneak
+										// ordu zehatz batzuen artean.
+
+	public List<Geltokia> geltokiak; // Hurbil dauden geltokien zerrenda
+
+	GeltokienZerrendaParcelabe geltokiZerrendaBidaltzeko = new GeltokienZerrendaParcelabe();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -64,33 +71,32 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 
 		// LocationManager-a erabiliko dugu GPS-a erabiltzeko
-		locManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+		locManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		List<String> zerrendaProviders = locManager.getAllProviders();
 		Criteria req = new Criteria();
 		req.setAccuracy(Criteria.ACCURACY_FINE);
 		String providerOnena = locManager.getBestProvider(req, false);
-		Log.i("consola", "Zerbitzari onena: "+providerOnena);
+		Log.i("consola", "Zerbitzari onena: " + providerOnena);
 		locListener = new NireLocationListener();
 		locManager.requestLocationUpdates(providerOnena, 0, 0, locListener);
 
-		//Geltoki izenaren trepeta lortu
-		txtGeltokia = (TextView)findViewById(R.id.txtGeltokia);
+		// Geltoki izenaren trepeta lortu
+		txtGeltokia = (TextView) findViewById(R.id.txtGeltokia);
 
-		//Bidaien zerrendaren trepeta lortu
-		listvBidaiak = (ListView)findViewById(R.id.listvBidaiak);
+		// Bidaien zerrendaren trepeta lortu
+		listvBidaiak = (ListView) findViewById(R.id.listvBidaiak);
 
 		/*
 		 * Ezarpenak
 		 */
 		ezarpenak = new Ezarpenak(this);
-		//Gordetako datuak lortu, baldin badaude
-		if(ezarpenak.getHurrunera() != 0)
+		// Gordetako datuak lortu, baldin badaude
+		if (ezarpenak.getHurrunera() != 0)
 			hurrunera = Integer.valueOf(ezarpenak.getHurrunera());
-		if(ezarpenak.getHasieraOrdua() != 0)
+		if (ezarpenak.getHasieraOrdua() != 0)
 			hasieraOrdua = Integer.valueOf(ezarpenak.getHasieraOrdua());
-		if(ezarpenak.getBukaeraOrdua() != 0)
+		if (ezarpenak.getBukaeraOrdua() != 0)
 			bukaeraOrdua = Integer.valueOf(ezarpenak.getBukaeraOrdua());
-
 
 		/*
 		 * Sortu datu basea
@@ -102,7 +108,6 @@ public class MainActivity extends Activity {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 
 		/**
 		 * Geltokia lortzeko botoia
@@ -119,11 +124,18 @@ public class MainActivity extends Activity {
 				/* Datu base ireki */
 				datuBasea.openDataBase();
 				/* Nire kokapena zehaztu */
-				double actLat = locManager.getLastKnownLocation(locManager.NETWORK_PROVIDER).getLatitude();
-				double actLon = locManager.getLastKnownLocation(locManager.NETWORK_PROVIDER).getLongitude();
+				double actLat = locManager.getLastKnownLocation(
+						locManager.NETWORK_PROVIDER).getLatitude();
+				double actLon = locManager.getLastKnownLocation(
+						locManager.NETWORK_PROVIDER).getLongitude();
 				/* Datu basean hurbilen dauden geltokiak bilatu */
-				List<Geltokia> geltokiak = datuBasea.geltokiakIrakurri(actLat+MAX_LAT_DIFF, actLat-MAX_LAT_DIFF,
-						actLon+MAX_LON_DIFF, actLon-MAX_LON_DIFF);
+				// List<Geltokia> geltokiak =
+				// datuBasea.geltokiakIrakurri(actLat+MAX_LAT_DIFF,
+				// actLat-MAX_LAT_DIFF,
+				// actLon+MAX_LON_DIFF, actLon-MAX_LON_DIFF);
+				geltokiak = datuBasea.geltokiakIrakurri(actLat + MAX_LAT_DIFF,
+						actLat - MAX_LAT_DIFF, actLon + MAX_LON_DIFF, actLon
+								- MAX_LON_DIFF);
 				/* Datu basea itxi */
 				datuBasea.close();
 				/* Aukeratutako geltoki kopurua lortu */
@@ -132,24 +144,25 @@ public class MainActivity extends Activity {
 				boolean geltokiaAurkituta = false;
 				/* Hurbilen dagoen geltokia aukeratu */
 				int azkenDistantzia = hurrunera;
-				for(int i=0; i<geltokiKopurua; i++) {
+				for (int i = 0; i < geltokiKopurua; i++) {
 					int distantzia = getDistance(actLat, actLon,
-							geltokiak.get(i).getLat(), geltokiak.get(i).getLon()); 
+							geltokiak.get(i).getLat(), geltokiak.get(i)
+									.getLon());
+					geltokiak.get(i).setDistantzia(distantzia);
 					if (distantzia < azkenDistantzia) {
 						azkenDistantzia = distantzia;
 						geltokiHurbilena = geltokiak.get(i);
 						geltokiaAurkituta = true; // Geltoki bat behintzat...
 					}
 				}
-				if(geltokiaAurkituta) {
+				if (geltokiaAurkituta) {
 					txtGeltokia.setText(geltokiHurbilena.getName());
 					/* Geltoki horri dagozkion geldiuneak aurkitu */
 					bkgndHurrengoGeltokiakAurkitu task1 = new bkgndHurrengoGeltokiakAurkitu();
-					int[] geltokiHurbilenaId = {0};
+					int[] geltokiHurbilenaId = { 0 };
 					geltokiHurbilenaId[0] = geltokiHurbilena.getId();
 					task1.execute(geltokiHurbilenaId[0]);
-				}
-				else {
+				} else {
 					/* Gaitu berriro botoia */
 					btnGeltokiaLortu.setEnabled(true);
 					txtGeltokia.setText("Ez dago geltokirik inguruan...");
@@ -159,7 +172,6 @@ public class MainActivity extends Activity {
 
 	}
 
-
 	/**
 	 * Activity-a berriro hastean, gordetako datuak berreskuratu.
 	 */
@@ -167,25 +179,25 @@ public class MainActivity extends Activity {
 	protected void onResume() {
 		// TODO Auto-generated method stub
 		super.onResume();
-		//Gordetako datuak lortu, baldin badaude
-		if(ezarpenak.getHurrunera() != 0)
+		// Gordetako datuak lortu, baldin badaude
+		if (ezarpenak.getHurrunera() != 0)
 			hurrunera = Integer.valueOf(ezarpenak.getHurrunera());
-		if(ezarpenak.getHasieraOrdua() != 0)
+		if (ezarpenak.getHasieraOrdua() != 0)
 			hasieraOrdua = Integer.valueOf(ezarpenak.getHasieraOrdua());
-		if(ezarpenak.getBukaeraOrdua() != 0)
+		if (ezarpenak.getBukaeraOrdua() != 0)
 			bukaeraOrdua = Integer.valueOf(ezarpenak.getBukaeraOrdua());
 
 	}
 
-
 	/**
-	 * Tarea asinkronoa. Geltokiak lortzeko kodea hemen dago, tarea
-	 * printzipala asko luzatu ez dadin.
+	 * Tarea asinkronoa. Geltokiak lortzeko kodea hemen dago, tarea printzipala
+	 * asko luzatu ez dadin.
+	 * 
 	 * @author lander
-	 *
+	 * 
 	 */
-	private class bkgndHurrengoGeltokiakAurkitu extends AsyncTask<Integer, Void, List<StopTimes>>
-	{
+	private class bkgndHurrengoGeltokiakAurkitu extends
+			AsyncTask<Integer, Void, List<StopTimes>> {
 		@Override
 		protected void onPreExecute() {
 
@@ -198,14 +210,21 @@ public class MainActivity extends Activity {
 			datuBasea.openDataBase();
 			/* Uneko ordua eta eguna lortu */
 			Calendar dataOrdua = Calendar.getInstance();
-			int orduaSegundutan = getDayTimeSeconds(dataOrdua.get(dataOrdua.HOUR_OF_DAY), dataOrdua.get(dataOrdua.MINUTE), dataOrdua.get(dataOrdua.SECOND));
-			//orduaSegundutan = 46800; // 13:00:00ak direla simulatzeko
-			//orduaSegundutan = 0; // 00:00:00ak direla simulatzeko
+			int orduaSegundutan = getDayTimeSeconds(
+					dataOrdua.get(dataOrdua.HOUR_OF_DAY),
+					dataOrdua.get(dataOrdua.MINUTE),
+					dataOrdua.get(dataOrdua.SECOND));
+			// orduaSegundutan = 46800; // 13:00:00ak direla simulatzeko
+			// orduaSegundutan = 0; // 00:00:00ak direla simulatzeko
 			/* Geltoki honetako geldiuneak atera */
-			Log.i("consola", "Hasiera ordua: "+hasieraOrdua+" Bukaera ordua: "+bukaeraOrdua+" Ordua segundotan: "+orduaSegundutan);
-			List<StopTimes> geldiuneak = datuBasea.geldialdiakIrakurri(geltokiHurbilenareId, orduaSegundutan+bukaeraOrdua*60, orduaSegundutan-hasieraOrdua*60);
+			Log.i("consola", "Hasiera ordua: " + hasieraOrdua
+					+ " Bukaera ordua: " + bukaeraOrdua + " Ordua segundotan: "
+					+ orduaSegundutan);
+			List<StopTimes> geldiuneak = datuBasea.geldialdiakIrakurri(
+					geltokiHurbilenareId, orduaSegundutan + bukaeraOrdua * 60,
+					orduaSegundutan - hasieraOrdua * 60);
 			int geldiuneKopurua = geldiuneak.size();
-			Log.i("consola", "Geldiune kopurua: "+geldiuneKopurua);
+			Log.i("consola", "Geldiune kopurua: " + geldiuneKopurua);
 			/* Datu basea itxi */
 			datuBasea.close();
 			return geldiuneak;
@@ -214,28 +233,31 @@ public class MainActivity extends Activity {
 		@Override
 		protected void onPostExecute(List<StopTimes> geldiuneak) {
 
-			if(geldiuneak.size() > 0) {
-				StopTimesAdapter geldiuneAdapter = new StopTimesAdapter(getApplicationContext(), geldiuneak);
+			if (geldiuneak.size() > 0) {
+				StopTimesAdapter geldiuneAdapter = new StopTimesAdapter(
+						getApplicationContext(), geldiuneak);
 				geldiuneAdapter.getView(0, null, null);
 				listvBidaiak.setAdapter(geldiuneAdapter);
-				for(int i=0; i<geldiuneak.size(); i++) {
-					String buff = hurrengoGeltokiakLortu(geldiuneak.get(i).getId(), geldiuneak.get(i).getStopId());
+				for (int i = 0; i < geldiuneak.size(); i++) {
+					String buff = hurrengoGeltokiakLortu(geldiuneak.get(i)
+							.getId(), geldiuneak.get(i).getStopId());
 					geldiuneak.get(i).setHurrengoGeltokiak(buff);
 				}
 				geldiuneAdapter.getView(0, null, null);
 				listvBidaiak.setAdapter(geldiuneAdapter);
-			}
-			else {
-				Toast.makeText( getApplicationContext(),"Ez da autobusik aurkitu",Toast.LENGTH_LONG).show();
+			} else {
+				Toast.makeText(getApplicationContext(),
+						"Ez da autobusik aurkitu", Toast.LENGTH_LONG).show();
 			}
 			/* Gaitu berriro botoia */
-			Button btnGeltokiaLortu = (Button)findViewById(R.id.btnGeltokiaLortu);
+			Button btnGeltokiaLortu = (Button) findViewById(R.id.btnGeltokiaLortu);
 			btnGeltokiaLortu.setEnabled(true);
 		}
 	}
 
 	/**
 	 * Ruta bat emanda, geltoki baten hurrengo geltokiak bilatu.
+	 * 
 	 * @param trip_id
 	 * @param stop_id
 	 */
@@ -251,36 +273,46 @@ public class MainActivity extends Activity {
 
 	/**
 	 * Eguneko ordua segundutan ematen du (gauerditik pasa diren segunduak).
+	 * 
 	 * @param hours
 	 * @param minutes
 	 * @param seconds
 	 * @return Gauerditik pasatu den segundu kopurua.
 	 */
 	public int getDayTimeSeconds(int hours, int minutes, int seconds) {
-		int minutuakGuztira = hours*60 + minutes;
-		int segunduakGuztira = minutuakGuztira*60 + seconds;
-		return segunduakGuztira;		
+		int minutuakGuztira = hours * 60 + minutes;
+		int segunduakGuztira = minutuakGuztira * 60 + seconds;
+		return segunduakGuztira;
 	}
 
 	/**
 	 * Bi punturen arteko distantzia kalkulatzen du.
-	 * @param lat_a A puntuaren latitudea.
-	 * @param lng_a A puntuaren longitudea.
-	 * @param lat_b B puntuaren latitudea.
-	 * @param lon_b B puntuaren longitudea.
+	 * 
+	 * @param lat_a
+	 *            A puntuaren latitudea.
+	 * @param lng_a
+	 *            A puntuaren longitudea.
+	 * @param lat_b
+	 *            B puntuaren latitudea.
+	 * @param lon_b
+	 *            B puntuaren longitudea.
 	 * @return Distantzia metrotan.
 	 */
-	public static int getDistance(double lat_a, double lng_a, double lat_b, double lon_b){
-		int Radius = 6371000; //Radio de la tierra
+	public static int getDistance(double lat_a, double lng_a, double lat_b,
+			double lon_b) {
+		int Radius = 6371000; // Radio de la tierra
 		double lat1 = lat_a;
 		double lat2 = lat_b;
 		double lon1 = lng_a;
 		double lon2 = lon_b;
-		double dLat = Math.toRadians(lat2-lat1);
-		double dLon = Math.toRadians(lon2-lon1);
-		double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) * Math.sin(dLon /2) * Math.sin(dLon/2);
+		double dLat = Math.toRadians(lat2 - lat1);
+		double dLon = Math.toRadians(lon2 - lon1);
+		double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+				+ Math.cos(Math.toRadians(lat1))
+				* Math.cos(Math.toRadians(lat2)) * Math.sin(dLon / 2)
+				* Math.sin(dLon / 2);
 		double c = 2 * Math.asin(Math.sqrt(a));
-		return (int) (Radius * c);  
+		return (int) (Radius * c);
 
 	}
 
@@ -302,29 +334,47 @@ public class MainActivity extends Activity {
 	}
 
 	/**
+	 * Geltokien activity-ra joateko funtzioa.
+	 */
+	public void gotoGeltokiak() {
+		geltokiZerrendaBidaltzeko.clear();
+		int size = geltokiak.size();
+		for (int j=0; j<size; j++) {
+			geltokiZerrendaBidaltzeko.add(geltokiak.get(j));
+		}
+		Intent i = new Intent(this, GeltokiakActivity.class);
+		Bundle container = new Bundle();
+		container.putParcelable("array", geltokiZerrendaBidaltzeko);
+		i.putExtras(container);
+		startActivity(i);
+	}
+
+	/**
 	 * Aplikazio honi buruzko lehioa definitzen duen klasea.
+	 * 
 	 * @author lander
-	 *
+	 * 
 	 */
 	public class HoniBuruzLehioa extends DialogFragment {
 		@Override
 		public Dialog onCreateDialog(Bundle savedInstanceState) {
 
-			AlertDialog.Builder builder =
-					new AlertDialog.Builder(getActivity());
+			AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
-			builder.setMessage("Hurbilen dagoen geltokia lortu eta hurrengo autobusak zeintzuk diren erakusten du.")
-			.setTitle("Honi buruz...")
-			.setPositiveButton("Ados", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int id) {
-					dialog.cancel();
-				}
-			});
+			builder.setMessage(
+					"Hurbilen dagoen geltokia lortu eta hurrengo autobusak zeintzuk diren erakusten du.")
+					.setTitle("Honi buruz...")
+					.setPositiveButton("Ados",
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int id) {
+									dialog.cancel();
+								}
+							});
 
 			return builder.create();
 		}
 	}
-
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -340,6 +390,9 @@ public class MainActivity extends Activity {
 		case R.id.action_settings:
 			gotoSettings();
 			return true;
+		case R.id.action_geltokiak:
+			gotoGeltokiak();
+			return true;
 		case R.id.action_honiburuz:
 			showHelp();
 			return true;
@@ -348,29 +401,32 @@ public class MainActivity extends Activity {
 		}
 	}
 
-
 	/**
 	 * GPSa erabili ahal izateko klasea.
+	 * 
 	 * @author lander
-	 *
+	 * 
 	 */
-	public class NireLocationListener implements LocationListener
-	{
+	public class NireLocationListener implements LocationListener {
 		public void onLocationChanged(Location loc)
 
 		{
 			loc.getLatitude();
 			loc.getLongitude();
 		}
-		public void onProviderDisabled(String provider)
-		{
-			Toast.makeText( getApplicationContext(),"GPSa ez dago erabilgarri",Toast.LENGTH_SHORT).show();
+
+		public void onProviderDisabled(String provider) {
+			Toast.makeText(getApplicationContext(), "GPSa ez dago erabilgarri",
+					Toast.LENGTH_SHORT).show();
 		}
-		public void onProviderEnabled(String provider)
-		{
-			Toast.makeText( getApplicationContext(),"GPSa erabilgarri dago",Toast.LENGTH_SHORT).show();
+
+		public void onProviderEnabled(String provider) {
+			Toast.makeText(getApplicationContext(), "GPSa erabilgarri dago",
+					Toast.LENGTH_SHORT).show();
 		}
-		public void onStatusChanged(String provider, int status, Bundle extras){}
+
+		public void onStatusChanged(String provider, int status, Bundle extras) {
+		}
 
 	}
 }

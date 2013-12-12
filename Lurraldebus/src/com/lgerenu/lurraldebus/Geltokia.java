@@ -7,13 +7,18 @@ public class Geltokia {
 	private String desc; // Deskribapena
 	private double lat; // Latitudea
 	private double lon; // Longitudea
+	private int distantzia; // Gauden puntutik geltokiraino dagoen distantzia metrotan
 	
-	public Geltokia (int id, String name, String desc, double lat, double lon){
+	public Geltokia (){
+	}
+	
+	public Geltokia (int id, String name, String desc, double lat, double lon, int distantzia){
 		this.id = id;
 		this.name = name;
 		this.desc = desc;
 		this.lat = lat;
 		this.lon = lon;
+		this.distantzia = distantzia;
 	}
 	
 	/**
@@ -62,5 +67,13 @@ public class Geltokia {
 	
 	public void setLon(double lon) {
 		this.lon = lon;
+	}
+
+	public int getDistantzia() {
+		return distantzia;
+	}
+
+	public void setDistantzia(int distantzia) {
+		this.distantzia = distantzia;
 	}
 }
