@@ -144,11 +144,14 @@ public class MainActivity extends Activity {
 				boolean geltokiaAurkituta = false;
 				/* Hurbilen dagoen geltokia aukeratu */
 				int azkenDistantzia = hurrunera;
+				geltokiZerrendaBidaltzeko.clear();
 				for (int i = 0; i < geltokiKopurua; i++) {
 					int distantzia = getDistance(actLat, actLon,
 							geltokiak.get(i).getLat(), geltokiak.get(i)
 									.getLon());
 					geltokiak.get(i).setDistantzia(distantzia);
+					if(distantzia < hurrunera)
+						geltokiZerrendaBidaltzeko.add(geltokiak.get(i));
 					if (distantzia < azkenDistantzia) {
 						azkenDistantzia = distantzia;
 						geltokiHurbilena = geltokiak.get(i);
@@ -337,11 +340,6 @@ public class MainActivity extends Activity {
 	 * Geltokien activity-ra joateko funtzioa.
 	 */
 	public void gotoGeltokiak() {
-		geltokiZerrendaBidaltzeko.clear();
-		int size = geltokiak.size();
-		for (int j=0; j<size; j++) {
-			geltokiZerrendaBidaltzeko.add(geltokiak.get(j));
-		}
 		Intent i = new Intent(this, GeltokiakActivity.class);
 		Bundle container = new Bundle();
 		container.putParcelable("array", geltokiZerrendaBidaltzeko);
