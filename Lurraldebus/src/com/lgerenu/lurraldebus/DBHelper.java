@@ -121,16 +121,12 @@ public class DBHelper extends SQLiteOpenHelper {
 
 	/**
 	 * Geltokien zerrenda bat lortzen da, latitude eta longitude tarte batean.
-	 * @param maxLat
-	 * @param minLat
-	 * @param maxLon
-	 * @param minLon
 	 * @return
 	 */
-	public List<Geltokia> geltokiakIrakurri(double maxLat, double minLat, double maxLon, double minLon) {
+	public List<Geltokia> geltokiakIrakurri() {
 		SQLiteDatabase db = getReadableDatabase();
 		List<Geltokia> zerrendaGeltokiak = new ArrayList<Geltokia>();
-		String query = "SELECT * FROM gtfs_stops WHERE stop_lat>"+minLat+" AND stop_lat<"+maxLat+" AND stop_lon>"+minLon+" AND stop_lon<"+maxLon;
+		String query = "SELECT * FROM gtfs_stops";
 		Cursor c = db.rawQuery(query, null);
 		c.moveToFirst();
 		do {

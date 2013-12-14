@@ -5,6 +5,7 @@ import java.util.Calendar;
 import java.util.Iterator;
 import java.util.List;
 
+import android.R.integer;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -34,16 +35,6 @@ public class MainActivity extends Activity {
 	private LocationListener locListener;
 	private DBHelper datuBasea;
 
-	/* Latitudean dagoen diferentziarik handiena geltoki hurbilena aurkitzeko */
-	private static double MAX_LAT_DIFF = 0.05;
-	/* Longitudean dagoen diferentziarik handiena geltoki hurbilena aurkitzeko */
-	private static double MAX_LON_DIFF = 0.05;
-
-	/* Oraingo ordutik zenbat segundu aurrera begiratuko diren autobusak */
-	private static int MAX_BUS_STOP_TIME = 3600; // 1:00h
-	/* Oraingo ordutik zenbat segundu atzera begiratuko diren autobusak */
-	private static int MIN_BUS_STOP_TIME = 300; // 5min
-
 	private TextView txtGeltokia;
 
 	private Geltokia geltokiHurbilena;
@@ -61,9 +52,13 @@ public class MainActivity extends Activity {
 	private List<StopTimes> geldiuneak; // Geltoki hurbilenean dauden geldiuneak
 										// ordu zehatz batzuen artean.
 
-	public List<Geltokia> geltokiak; // Hurbil dauden geltokien zerrenda
+	private boolean geltokiaAurkituta = false; // Geltokirik aurkitu denentz
+												// jakiteko aldagaia
 
-	GeltokienZerrendaParcelabe geltokiZerrendaBidaltzeko = new GeltokienZerrendaParcelabe();
+	private List<Geltokia> geltokiak; // Hurbil dauden geltokien zerrenda
+
+	private GeltokienZerrendaParcelabe geltokiZerrendaBidaltzeko = new GeltokienZerrendaParcelabe();
+	private int requestCode = 1;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -121,50 +116,15 @@ public class MainActivity extends Activity {
 				btnGeltokiaLortu.setEnabled(false);
 				/* Zerrenda hustu */
 				listvBidaiak.setAdapter(null);
-				/* Datu base ireki */
-				datuBasea.openDataBase();
 				/* Nire kokapena zehaztu */
 				double actLat = locManager.getLastKnownLocation(
 						locManager.NETWORK_PROVIDER).getLatitude();
 				double actLon = locManager.getLastKnownLocation(
 						locManager.NETWORK_PROVIDER).getLongitude();
 				/* Datu basean hurbilen dauden geltokiak bilatu */
-				// List<Geltokia> geltokiak =
-				// datuBasea.geltokiakIrakurri(actLat+MAX_LAT_DIFF,
-				// actLat-MAX_LAT_DIFF,
-				// actLon+MAX_LON_DIFF, actLon-MAX_LON_DIFF);
-				geltokiak = datuBasea.geltokiakIrakurri(actLat + MAX_LAT_DIFF,
-						actLat - MAX_LAT_DIFF, actLon + MAX_LON_DIFF, actLon
-								- MAX_LON_DIFF);
-				/* Datu basea itxi */
-				datuBasea.close();
-				/* Aukeratutako geltoki kopurua lortu */
-				int geltokiKopurua = geltokiak.size();
-				/* Geltokirik aurkitu denentz jakiteko aldagaia */
-				boolean geltokiaAurkituta = false;
-				/* Hurbilen dagoen geltokia aukeratu */
-				int azkenDistantzia = hurrunera;
-				geltokiZerrendaBidaltzeko.clear();
-				for (int i = 0; i < geltokiKopurua; i++) {
-					int distantzia = getDistance(actLat, actLon,
-							geltokiak.get(i).getLat(), geltokiak.get(i)
-									.getLon());
-					geltokiak.get(i).setDistantzia(distantzia);
-					if(distantzia < hurrunera)
-						geltokiZerrendaBidaltzeko.add(geltokiak.get(i));
-					if (distantzia < azkenDistantzia) {
-						azkenDistantzia = distantzia;
-						geltokiHurbilena = geltokiak.get(i);
-						geltokiaAurkituta = true; // Geltoki bat behintzat...
-					}
-				}
+				geltokiHurbilenakBilatu(actLat, actLon);
 				if (geltokiaAurkituta) {
-					txtGeltokia.setText(geltokiHurbilena.getName());
-					/* Geltoki horri dagozkion geldiuneak aurkitu */
-					bkgndHurrengoGeltokiakAurkitu task1 = new bkgndHurrengoGeltokiakAurkitu();
-					int[] geltokiHurbilenaId = { 0 };
-					geltokiHurbilenaId[0] = geltokiHurbilena.getId();
-					task1.execute(geltokiHurbilenaId[0]);
+					autobusakBilatu();
 				} else {
 					/* Gaitu berriro botoia */
 					btnGeltokiaLortu.setEnabled(true);
@@ -259,6 +219,51 @@ public class MainActivity extends Activity {
 	}
 
 	/**
+	 * Geltoki batetik pasatzen diren autobusak bilatu.
+	 */
+	private void autobusakBilatu() {
+		txtGeltokia.setText(geltokiHurbilena.getName());
+		/* Zerrenda garbitu */
+		listvBidaiak.setAdapter(null);
+		/* Geltoki horri dagozkion geldiuneak aurkitu */
+		bkgndHurrengoGeltokiakAurkitu task1 = new bkgndHurrengoGeltokiakAurkitu();
+		int[] geltokiHurbilenaId = { 0 };
+		geltokiHurbilenaId[0] = geltokiHurbilena.getId();
+		task1.execute(geltokiHurbilenaId[0]);
+	}
+
+	/**
+	 * Kokapen bat emanda, inguruko geltokiak aurkitu.
+	 * 
+	 * @param actLat
+	 *            Uneko latitudea
+	 * @param actLon
+	 *            Uneko longitudea
+	 */
+	private void geltokiHurbilenakBilatu(double actLat, double actLon) {
+		datuBasea.openDataBase();
+		geltokiak = datuBasea.geltokiakIrakurri();
+		datuBasea.close();
+		/* Aukeratutako geltoki kopurua lortu */
+		int geltokiKopurua = geltokiak.size();
+		/* Hurbilen dagoen geltokia aukeratu */
+		int azkenDistantzia = hurrunera;
+		geltokiZerrendaBidaltzeko.clear();
+		for (int i = 0; i < geltokiKopurua; i++) {
+			int distantzia = getDistance(actLat, actLon, geltokiak.get(i)
+					.getLat(), geltokiak.get(i).getLon());
+			geltokiak.get(i).setDistantzia(distantzia);
+			if (distantzia < hurrunera)
+				geltokiZerrendaBidaltzeko.add(geltokiak.get(i));
+			if (distantzia < azkenDistantzia) {
+				azkenDistantzia = distantzia;
+				geltokiHurbilena = geltokiak.get(i);
+				geltokiaAurkituta = true; // Geltoki bat behintzat...
+			}
+		}
+	}
+
+	/**
 	 * Ruta bat emanda, geltoki baten hurrengo geltokiak bilatu.
 	 * 
 	 * @param trip_id
@@ -344,7 +349,20 @@ public class MainActivity extends Activity {
 		Bundle container = new Bundle();
 		container.putParcelable("array", geltokiZerrendaBidaltzeko);
 		i.putExtras(container);
-		startActivity(i);
+		// startActivity(i);
+		startActivityForResult(i, requestCode);
+	}
+
+	/**
+	 * GeltokiakActivity-tik bueltatzean, hango informazioa jasotzeko.
+	 */
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		int i = Integer.parseInt(data.getDataString());
+		Log.i("consola", "Geltokietako emaitza = "+i);
+		geltokiHurbilena = geltokiZerrendaBidaltzeko.get(i);
+		autobusakBilatu();
 	}
 
 	/**
