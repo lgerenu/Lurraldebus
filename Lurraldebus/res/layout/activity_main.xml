@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/listvBidaiak"
         android:layout_alignParentTop="true"
-        android:text="Geltokia lortu" />
+        android:text="@string/main_geltokia_lortu" />
 
     <TextView
         android:id="@+id/txtGeltokia"
@@ -30,9 +30,9 @@
         android:layout_height="wrap_content"
         android:layout_alignBaseline="@+id/btnGeltokiaLortu"
         android:layout_alignBottom="@+id/btnGeltokiaLortu"
-        android:layout_alignRight="@+id/listvBidaiak"
+        android:layout_alignParentRight="true"
         android:layout_toRightOf="@+id/btnGeltokiaLortu"
-        android:text="Geltokirik ez..."
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:text="@string/main_geltokirik_Ez"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
 </RelativeLayout>

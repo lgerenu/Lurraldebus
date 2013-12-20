@@ -11,5 +11,7 @@
     <string name="settings_bukaerako_ordua">Oraingo ordutik minutu hauek pasatu arte begiratu autobusak</string>
     <string name="geltokiak_irten">Irten</string>
     <string name="action_geltokia">Inguruko geltokiak</string>
+    <string name="main_geltokirik_Ez">Geltokirik ez...</string>
+    <string name="main_geltokia_lortu">Geltokia lortu</string>
 
 </resources>

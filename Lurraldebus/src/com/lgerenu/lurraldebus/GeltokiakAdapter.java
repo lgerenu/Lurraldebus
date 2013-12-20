@@ -12,58 +12,60 @@ import android.widget.TextView;
 
 public class GeltokiakAdapter extends BaseAdapter {
 
-	private List<Geltokia> geltokiZerrenda;
-	private LayoutInflater lInflater;
+  private List<Geltokia> geltokiZerrenda;
+  private LayoutInflater lInflater;
 
-	public GeltokiakAdapter(Context context, List<Geltokia> geltokiak) {
-		this.lInflater = LayoutInflater.from(context);
-		this.geltokiZerrenda = geltokiak;
-	}
+  public GeltokiakAdapter(Context context, List<Geltokia> geltokiak) {
+    this.lInflater = LayoutInflater.from(context);
+    this.geltokiZerrenda = geltokiak;
+  }
 
-	@Override
-	public int getCount() {
-		return geltokiZerrenda.size();
-	}
+  @Override
+  public int getCount() {
+    return geltokiZerrenda.size();
+  }
 
-	@Override
-	public Object getItem(int arg0) {
-		return geltokiZerrenda.get(arg0);
-	}
+  @Override
+  public Object getItem(int arg0) {
+    return geltokiZerrenda.get(arg0);
+  }
 
-	@Override
-	public long getItemId(int arg0) {
-		return arg0;
-	}
+  @Override
+  public long getItemId(int arg0) {
+    return arg0;
+  }
 
-	@Override
-	public View getView(int arg0, View arg1, ViewGroup arg2) {
-		ContenedorView contenedor = null;
-		if (arg1 == null){
-			arg1 = lInflater.inflate(R.layout.geltokiak_layout, null);
+  @Override
+  public View getView(int arg0, View arg1, ViewGroup arg2) {
+    ContenedorView contenedor = null;
+    if (arg1 == null) {
+      arg1 = lInflater.inflate(R.layout.geltokiak_layout, null);
 
-			contenedor = new ContenedorView();
-			contenedor.izena = (TextView) arg1.findViewById(R.id.izena);
-			contenedor.deskribapena = (TextView) arg1.findViewById(R.id.deskribapena);
-			contenedor.distantzia = (TextView) arg1.findViewById(R.id.distantzia);
+      contenedor = new ContenedorView();
+      contenedor.izena = (TextView) arg1.findViewById(R.id.izena);
+      contenedor.distantzia = (TextView) arg1.findViewById(R.id.distantzia);
 
-			arg1.setTag(contenedor);
-		} else
-			contenedor = (ContenedorView) arg1.getTag();
+      arg1.setTag(contenedor);
+    } else
+      contenedor = (ContenedorView) arg1.getTag();
 
-		Geltokia geltokiak = (Geltokia) getItem(arg0);
-		contenedor.izena.setText(geltokiak.getName());
-		contenedor.deskribapena.setText(geltokiak.getDesc());
-		String strTemp = String.valueOf(geltokiak.getDistantzia());
-		contenedor.distantzia.setText(strTemp+" metro");
+    Geltokia geltokiak = (Geltokia) getItem(arg0);
+    String strDeskribapena = geltokiak.getDesc();
+    String strIzena = geltokiak.getName();
+    if (strDeskribapena != null) {
+      contenedor.izena.setText(strDeskribapena);
+    } else {
+      contenedor.izena.setText(strIzena);
+    }
+    String strTemp = String.valueOf(geltokiak.getDistantzia());
+    contenedor.distantzia.setText(strTemp + " metro");
 
-		return arg1;
-	}
+    return arg1;
+  }
 
-
-	class ContenedorView {
-		TextView izena;
-		TextView deskribapena;
-		TextView distantzia;
-	}
+  class ContenedorView {
+    TextView izena;
+    TextView distantzia;
+  }
 
 }
