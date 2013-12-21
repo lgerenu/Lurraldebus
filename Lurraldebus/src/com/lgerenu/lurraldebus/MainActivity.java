@@ -11,6 +11,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -40,6 +41,8 @@ public class MainActivity extends Activity {
   private Geltokia geltokiHurbilena;
 
   private ListView listvBidaiak;
+  
+  private ProgressDialog itxaronLehioa; /* Itxaron arazteko lehioa */
 
   /* Ezarpenak */
   private Ezarpenak ezarpenak; // Ezarpenak gordetzeko klasea
@@ -104,6 +107,9 @@ public class MainActivity extends Activity {
       e.printStackTrace();
     }
 
+    /* Geltoki hurbilena lortu eta bertatik pasatzen diren autobusak bilatu. */
+    geltokiaLortu();
+
     /**
      * Geltokia lortzeko botoia
      */
@@ -111,26 +117,34 @@ public class MainActivity extends Activity {
     btnGeltokiaLortu.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-        /* Botoia ezgaitu */
-        Button btnGeltokiaLortu = (Button) findViewById(R.id.btnGeltokiaLortu);
-        btnGeltokiaLortu.setEnabled(false);
-        /* Zerrenda hustu */
-        listvBidaiak.setAdapter(null);
-        /* Nire kokapena zehaztu */
-        double actLat = locManager.getLastKnownLocation(locManager.NETWORK_PROVIDER).getLatitude();
-        double actLon = locManager.getLastKnownLocation(locManager.NETWORK_PROVIDER).getLongitude();
-        /* Datu basean hurbilen dauden geltokiak bilatu */
-        geltokiHurbilenakBilatu(actLat, actLon);
-        if (geltokiaAurkituta) {
-          autobusakBilatu();
-        } else {
-          /* Gaitu berriro botoia */
-          btnGeltokiaLortu.setEnabled(true);
-          txtGeltokia.setText("Ez dago geltokirik inguruan...");
-        }
+        geltokiaLortu();
       }
     });
 
+  }
+
+  /**
+   * Geltoki hurbilena lortu eta bertatik pasatzen diren autobusak bilatzen
+   * ditu.
+   */
+  public void geltokiaLortu() {
+    /* Botoia ezgaitu */
+    Button btnGeltokiaLortu = (Button) findViewById(R.id.btnGeltokiaLortu);
+    btnGeltokiaLortu.setEnabled(false);
+    /* Zerrenda hustu */
+    listvBidaiak.setAdapter(null);
+    /* Nire kokapena zehaztu */
+    double actLat = locManager.getLastKnownLocation(locManager.NETWORK_PROVIDER).getLatitude();
+    double actLon = locManager.getLastKnownLocation(locManager.NETWORK_PROVIDER).getLongitude();
+    /* Datu basean hurbilen dauden geltokiak bilatu */
+    geltokiHurbilenakBilatu(actLat, actLon);
+    if (geltokiaAurkituta) {
+      autobusakBilatu();
+    } else {
+      /* Gaitu berriro botoia */
+      btnGeltokiaLortu.setEnabled(true);
+      txtGeltokia.setText("Ez dago geltokirik inguruan...");
+    }
   }
 
   /**
@@ -160,6 +174,12 @@ public class MainActivity extends Activity {
   private class bkgndHurrengoGeltokiakAurkitu extends AsyncTask<Integer, Void, List<StopTimes>> {
     @Override
     protected void onPreExecute() {
+      /* Itxaron lehioa sortu eta erakutsi */
+      itxaronLehioa = new ProgressDialog(MainActivity.this);
+      itxaronLehioa.setMessage("Geltoki eta autobusak bilatzen.\nItxaron, mesedez...");
+      itxaronLehioa.setCancelable(false);
+      itxaronLehioa.setIndeterminate(true);
+      itxaronLehioa.show();
 
     }
 
@@ -207,6 +227,8 @@ public class MainActivity extends Activity {
       /* Gaitu berriro botoia */
       Button btnGeltokiaLortu = (Button) findViewById(R.id.btnGeltokiaLortu);
       btnGeltokiaLortu.setEnabled(true);
+      /* Itxaron lehioa ezkutatu */
+      itxaronLehioa.dismiss();
     }
   }
 

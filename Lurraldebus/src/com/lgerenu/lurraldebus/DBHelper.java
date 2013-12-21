@@ -176,12 +176,8 @@ public class DBHelper extends SQLiteOpenHelper {
             c.getInt(3), c.getInt(4), c.getInt(5), c.getInt(6), route_id,
             routeIzenaLortu(route_id), service_id, "");
         // Begiratu ia gaurko bidaiak diren
-        if (gaurDaBidaia(data, service_id)) {
-          Log.i("consola", "Gaurko bidaia da.");
+        if (gaurDaBidaia(data, service_id))
           zerrendaGeldiuneak.add(geldiunea);
-        } else {
-          Log.i("consola", "Ez da gaurko bidaia");
-        }
       } while (c.moveToNext());
     }
     db.close();
