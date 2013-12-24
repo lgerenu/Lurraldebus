@@ -1,13 +1,30 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" >
+
+    <ImageView
+        android:id="@+id/imageView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/izena"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@id/izena"
+        android:adjustViewBounds="true"
+        android:contentDescription="&lt;div>Icon made by &lt;a href=&quot;http://www.flaticon.com/free-icon/omnibus_14179&quot; title=&quot;Vectorgraphit&quot;>Vectorgraphit&lt;/a> from &lt;a href=&quot;www.flaticon.com&quot; title=&quot;Flaticon&quot;>www.flaticon.com&lt;/a>&lt;/div>"
+        android:maxHeight="5dp"
+        android:maxWidth="5dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/omnibus" />
 
     <TextView
         android:id="@+id/izena"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
+        android:layout_marginRight="94dp"
+        android:layout_toRightOf="@drawable/omnibus"
         android:text="Medium Text"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
@@ -15,8 +32,8 @@
         android:id="@+id/bidaia"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/izena"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/imageView1"
         android:text="Medium Text"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
@@ -25,7 +42,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/izena"
+        android:layout_below="@id/bidaia"
         android:text="Medium Text"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 

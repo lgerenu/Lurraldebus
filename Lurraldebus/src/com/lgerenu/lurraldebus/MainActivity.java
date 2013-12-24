@@ -41,7 +41,7 @@ public class MainActivity extends Activity {
   private Geltokia geltokiHurbilena;
 
   private ListView listvBidaiak;
-  
+
   private ProgressDialog itxaronLehioa; /* Itxaron arazteko lehioa */
 
   /* Ezarpenak */
